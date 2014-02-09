@@ -17,7 +17,7 @@ Contents of InklyMain.js:
 	1) initialize 2D and game
 	2) set controls for the game
 	3) Set up screen managers
-	4) coming soon.....
+	4) coming soon....
 
 brine.js:
 This is the engine for the game 

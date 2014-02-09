@@ -229,6 +229,7 @@ mainMenu.init = function(){
 /*
  * more of his code that I need to understand before I use it
  * this is included in this commit so that we can all look through it together
+ * 
 
 var gameScreen = new Screen(false, true);
 gameScreen.image = Textures.load("http://www.jar42.com/brine/laststop/images/grass.png");
