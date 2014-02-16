@@ -1,0 +1,41 @@
+Objects in game:
+    Screen manager
+        //every single screen in a list
+    
+    Mouse manager
+        //used only on menus 
+    
+    Inky
+        x (relation to canvas)
+        y (relation to canvas)
+        progress through level (current pixels left in level/total pixels)
+            //used for slider
+        current height of jump
+        in air?
+        current jump velocity (parabolic jump)
+            jumps are just vertically for inky, stage camera takes care of that
+        
+    
+    platforms
+        color
+        collidable (boolean)
+        sprite
+        
+    Words for tutorial
+    
+    color switching diagram
+        current color
+        functions to switch color
+             change all platform sprites (possibly)
+    
+    exit
+        //must be clearly an exit
+        
+Global functions
+    death handler (screen)
+    respawn
+    reset
+    level generator
+    exit level (win state!)
+    password for getting to later level?
+    screen handlers (engine crap)

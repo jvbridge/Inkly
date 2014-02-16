@@ -26,7 +26,7 @@ function inky(){
 	//PLACEHOLDER current sprite spawning. Not used here in final version
 	inkySprite = new Sprite();
 	inkySprite.x = 20;
-	inkySprite.y = canvis.height - 60;
+	inkySprite.y = canvas.height - 60;
 	inkySprite.height = 40;
 	inkySprite.width = 40;
 	//temporary place holder until we get the next image
@@ -171,13 +171,13 @@ ScreenManager.prototype.draw = function (ctx) {
 var screenManager = new ScreenManager();
 
 //Sceen Manager has inhereted sprite properties so it can be added to the world
-world.addChild(screenManger);
+world.addChild(screenManager);
 
 //creates the main menu screen. 
 var mainMenu = new Screen(false,false);
 
 Textures.load("MainMenu.png");
-screenMan.push(mainMenu);
+screenManager.push(mainMenu);
 
 //Override the empty init function to set some properties
 mainMenu.init = function(){
@@ -229,7 +229,6 @@ mainMenu.init = function(){
 /*
  * more of his code that I need to understand before I use it
  * this is included in this commit so that we can all look through it together
- * 
 
 var gameScreen = new Screen(false, true);
 gameScreen.image = Textures.load("http://www.jar42.com/brine/laststop/images/grass.png");

@@ -1,5 +1,3 @@
-This is the readme file for Inkly. It needs to be updated periodically
-
 At this present time I've assumed a resolution of 680x480 if that proves to be
 insufficient we can up the size.
 
@@ -17,7 +15,7 @@ Contents of InklyMain.js:
 	1) initialize 2D and game
 	2) set controls for the game
 	3) Set up screen managers
-	4) coming soon....
+	4) coming soon.....
 
 brine.js:
 This is the engine for the game 
