@@ -39,3 +39,22 @@ Global functions
     exit level (win state!)
     password for getting to later level?
     screen handlers (engine crap)
+    
+Screens:
+	Main menu:
+		<new game>
+		<settings>
+		<password>?
+		<textbox for password>?
+		
+		Settings:
+		<game mode>
+		<cheats> (temporary)
+		<key controls>?
+		
+	Pause:
+		<end game>
+	
+	End of level:
+		<next level>
+		<end game>

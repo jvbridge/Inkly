@@ -88,6 +88,10 @@ function Screen(alwaysUpdate, alwaysDraw){
 //This allows the Screen class to inherit all sprite properties 
 Screen.prototype = new Sprite();
 
+Screen.prototype.init = function(){
+};
+
+
 /*
  * this is the screen manager class. It contains a list of all screens to use
  * as well as a series of functions to make said classes
@@ -97,7 +101,7 @@ function ScreenManager(){
 	Sprite.call(this);
 	
 	//list of all screens, data structure type is a stack
-	this.Screens = new List();
+	this.screens = new List();
 }
 //inherit all sprite properties just like each screen
 ScreenManager.prototype = new Sprite();
@@ -110,17 +114,17 @@ ScreenManager.prototype = new Sprite();
 ScreenManager.prototype.push = function(screen){
     this.screens.remove(screen);
     this.screens.push(screen);
-};
+}
 
 ScreenManager.prototype.pop = function(){
     this.screens.tail.item.gui.visible = false;
     return this.screens.pop();
-};
+}
 
 ScreenManager.prototype.remove = function(screen){
     screen.gui.visible = false;
     this.screens.remove(screen);
-};
+}
 
 //Update function for the screen manager
 ScreenManager.prototype.update = function (d) {
@@ -156,6 +160,7 @@ ScreenManager.prototype.update = function (d) {
 
 //The draw function needs to be overridden as well to mimic the update 
 //function except this checks alwaysDraw instead of alwaysUpdate
+//TODO: understand ctx
 ScreenManager.prototype.draw = function (ctx) {
     var screens = this.screens;
     
@@ -174,9 +179,11 @@ var screenManager = new ScreenManager();
 world.addChild(screenManager);
 
 //creates the main menu screen. 
-var mainMenu = new Screen(false,false);
 
-Textures.load("MainMenu.png");
+//TODO: set to false when game is shipped
+var mainMenu = new Screen(true,true);
+
+mainMenu.image = Textures.load("MainMenu.png");
 screenManager.push(mainMenu);
 
 //Override the empty init function to set some properties
@@ -224,6 +231,7 @@ mainMenu.init = function(){
     resumeGame.setLabelColors("#aaaaaa", "#ffffff", "#ff0000");
     this.gui.addChild(resumeGame);
     */
+
 }
 
 /*
