@@ -32,7 +32,6 @@ function inky(){
 	//temporary place holder until we get the next image
 	inkySprite.image = Textures.load("Inky.png");
 	this.Sprite = inkySprite;
-	world.addChild(inkySprite);
 }
 
 //create inky
@@ -56,10 +55,15 @@ inky.Sprite.update = function(d){
 	this.y += 1;
 }
 
+/****************************************************************************/
+/* 							MENUS and Manager								*/
+/****************************************************************************/
+
 /*
  * this part is where the code to make all screens (menus and such) are here
  * most of this code is copied from the example JS fiddle for screen 
- * management and sprite movement: http://jsfiddle.net/Selkcip/BMAam/
+ * management and sprite movement: http://jsfiddle.net/Selkcip/BMAam/ and then
+ * modified to fit our needs
  */
 
 //screen constructor
@@ -186,7 +190,7 @@ var mainMenu = new Screen(true,true);
 mainMenu.image = Textures.load("MainMenu.png");
 screenManager.push(mainMenu);
 
-//Override the empty init function to set some properties
+//All buttons and stuff that goes on the main menu go HERE
 mainMenu.init = function(){
     /*
      * since the size of the game is up for debate, the image will be assumed
@@ -198,20 +202,18 @@ mainMenu.init = function(){
     this.gui.x = canvas.width/2;
     this.gui.y = canvas.height/2;
     
-    //Add some sprites to the main menu
-    /*
-     * these are default menus given by brine. Ours will be different
-    var logo = new Sprite();
+    /* TODO: get logo for our game 
+     * Gavin's job
+     */
+   /* var logo = new Sprite();
     logo.x = canvas.width/2;
     logo.y = canvas.height/2;
     logo.xoffset = -logo.width/2;
     logo.yoffset = -logo.height/2;
-    logo.image = Textures.load("http://www.jar42.com/brine/starter/images/logo_filled.png");
-    logo.update = function(d){
-        logo.rotation += 0.01;
-    }
+    logo.image = Textures.load("LOGO TEXTURE HERE");
+   
     mainMenu.stage.addChild(logo);
-    
+    */
     var newGame = new TextButton("New Game");
     newGame.center = true;
     newGame.label.dropShadow = true;
@@ -220,7 +222,7 @@ mainMenu.init = function(){
     this.gui.addChild(newGame);
     
     newGame.func = function(){
-        screenMan.push(gameScreen);
+        screenManager.push(gameScreen);
     }
     
     var resumeGame = new TextButton("Resume Game");
@@ -230,106 +232,23 @@ mainMenu.init = function(){
     resumeGame.label.fontSize = 30;
     resumeGame.setLabelColors("#aaaaaa", "#ffffff", "#ff0000");
     this.gui.addChild(resumeGame);
-    */
+    
+    var credits = new T
 
 }
 
-/*
- * more of his code that I need to understand before I use it
- * this is included in this commit so that we can all look through it together
 
 var gameScreen = new Screen(false, true);
-gameScreen.image = Textures.load("http://www.jar42.com/brine/laststop/images/grass.png");
+gameScreen.image = Textures.load("TempGameScreen.png");
 
 //Override the empty init function to set some properties
 gameScreen.init = function(){
     //Since we set a background we want the screen to fill  the canvas
     this.width = canvas.width;
     this.height = canvas.height;
-    
-    //Create a new Sprite
-			var mySprite = new Sprite();
-			
-			//Set its dimensions
-			mySprite.width = 256;
-			mySprite.height = 256;
-			
-			//Shift the sprite so that its origin is at its center
-			//The offset is negative because we are moving the sprite relative to its origin and not the origin relative to the sprite
-			mySprite.xoffset = -mySprite.width/2;
-			mySprite.yoffset = -mySprite.height/2;
-			
-			//Set the sprite's texture
-			mySprite.image = Textures.load("http://www.jar42.com/brine/starter/images/logo_filled.png");
-			
-			//Add the sprite to the world
-			this.stage.addChild(mySprite);
-			
-			//A
-			gInput.addBool(65, "left");
-			//D
-			gInput.addBool(68, "right");
-			//S
-			gInput.addBool(83, "down");
-			//W
-			gInput.addBool(87, "up");
-			
-			//Override the default update function
-			//Define some variables to hold the sprite's x and y velocities
-			var xvel = 1;
-			var yvel = 1;
-			mySprite.update = function(d){
-				//Define a speed to move at
-				var speed = 2;
-				
-				//If the A key is pressed move to the left
-				if(gInput.left){
-					this.x -= speed;
-				}
-				
-				//If the D key is pressed move to the right
-				if(gInput.right){
-					this.x += speed;
-				}
-				
-				//If the S key is pressed move down
-				if(gInput.down){
-					//Note that an increasing y means moving down the screen
-					this.y += speed;
-				}
-				
-				//If the W key is pressed move up
-				if(gInput.up){
-					this.y -= speed;
-				}
-				
-				//Make the sprite warp to the opposite side of the canvas when it goes off a side
-				//If it goes off the left or right edge
-				if(this.x < 0){
-					this.x = canvas.width; //Place it on the right side
-				}else if(this.x > canvas.width){
-					this.x = 0; //Place it on the left side
-				}
-				
-				//If it goes off the top or bottom edge
-				if(this.y < 0){
-					this.y = canvas.height; //Place it at the bottom
-				}if(this.y > canvas.height){
-					this.y = 0; //Place it at the top
-				}
-				
-				//Find the horizontal distance between the sprite and the mouse
-				var xDis = gInput.mouse.x-this.x;
-				
-				//Find the vertical distance between the sprite and the mouse
-				var yDis = gInput.mouse.y-this.y;
-				
-				//Use those distances and the arctangent to calculate the angle from the sprite to the mouse
-				var angle = Math.atan2(yDis, xDis);
-				
-				//Set the sprite's rotation to the calculated angle
-				this.rotation = angle;
-			}
+    /*
+     * TODO: put all in game stuff here
+     */
 }
 
 var pauseMenu = new Screen(false, true);
@@ -349,7 +268,7 @@ pauseMenu.init = function(){
     resumeGame.setLabelColors("#aaaaaa", "#ffffff", "#ff0000");
     this.gui.addChild(resumeGame);
     resumeGame.func = function(){
-        screenMan.remove(pauseMenu);
+        screenManager.remove(pauseMenu);
     }
     
     var returnToMenu = new TextButton("Main Menu");
@@ -360,13 +279,25 @@ pauseMenu.init = function(){
     returnToMenu.setLabelColors("#aaaaaa", "#ffffff", "#ff0000");
     this.gui.addChild(returnToMenu);
     returnToMenu.func = function(){
-        screenMan.remove(pauseMenu);
-        screenMan.remove(gameScreen);
+        screenManager.remove(pauseMenu);
+        screenManager.remove(gameScreen);
     }
 }
 
+//This makes it so that escape will make the pause screen
 gInput.addFunc(27, function(){
-    if(screenMan.screens.find(gameScreen) && !screenMan.screens.find(pauseMenu)){
-        screenMan.push(pauseMenu);
+    if(screenManager.screens.find(gameScreen) && !screenManager.screens.find(pauseMenu)){
+        screenManager.push(pauseMenu);
     }
-});*/
+})
+
+var settingsMenu = new Screen(false,true);
+
+settingsMenu.init = function(){
+	
+	this.width = canvas.width;
+	this.height = canvas.height;
+	this.gui.x = canvas.width/2;
+    this.gui.y = canvas.height/2;
+	//TODO add buttons here
+}
