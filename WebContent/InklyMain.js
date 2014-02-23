@@ -124,7 +124,6 @@ world.addChild(screenManager);
 
 //creates the main menu screen. 
 
-//TODO: set to false when game is shipped
 var mainMenu = new Screen(false,false);
 
 mainMenu.image = Textures.load("MainMenu.png");
@@ -286,4 +285,66 @@ inky.Sprite.update = function(d){
 	}
 	//Inky usually falls if not given anything
 	this.y += 1;
+}
+
+
+function platform(x, y, color){
+	/*
+	 * generates sprite and returns object
+	 * sprite has left, right, 
+	 */
+	this.tangible = false;
+	this.color = color;
+	this.x = x;
+	this.y = y;
+	
+	this.top = y;
+	this.bottom = y - 30;
+	this.left = x;
+	this.right = x + 100;
+	
+	platSprite = new Sprite
+	platSprite.x = x;
+	platSprite.y = y;
+	platSprite.height = 30;
+	platSprite.width = 100;
+	
+	//TODO: placeholder texture, needs an update and a black one
+	if (color == "cyan")
+		platSprite.image = Textures.load("PlatformC.gif");
+	if (color == "magenta")
+		platSprite.image = Textures.load("PlatformM.gif");
+	if (color == "yellow")
+		platSprite.image = Textures.load("PlatformY.gif");
+	//if (color == "black")
+		//platSprite.image = Textures.load("PlatformB.gif");
+	
+	this.sprite = platSprite;
+
+	gameScreen.Stage.addChild(platSprite);
+}
+
+
+/****************************************************************************/
+/*						Helper functions									*/ 
+/****************************************************************************/
+
+//returns side sprite is colliding, returns "none" if sprites aren't colliding
+function spriteCollide(sprite){
+	
+	inkyLeft = 		inky.inkySprite.x;
+	inkyRight = 	inky.inkySprite.x + inky.inkySprite.width;
+	inkyTop = 		inky.inkySprite.y;
+	inkyBottom =	inky.inkySprite.y + inky.inkySprite.height;
+	
+	spriteLeft = 	sprite.x
+	spriteRight = 	sprite.x + sprite.width;
+	spriteTop = 	sprite.y
+	spriteBottom = 	sprite.y + sprite.height;
+	
+	if(inkyLeft <= spriteLeft && inkyRight >= spriteLeft && 
+			inkyBottom >= spriteTop && inkyTop <= spriteTop)
+		return true;
+	console.log("collision!");
+	
 }

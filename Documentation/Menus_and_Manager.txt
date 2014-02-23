@@ -10,7 +10,7 @@ Screen:
     alwaysUpdate
         boolean that sets the alwaysUpdate boolean in the object
         
-    Objects:
+    Properties:
     
     alwaysDraw
         Boolean that if true means the screen will always draw even when it is
@@ -23,6 +23,8 @@ Screen:
         updates when it is on top. 
     
     initialized
+        Boolean that is initially false. Set to true when screen has had its
+        init() function called.
     
     Stage
         Sprite used for each of the screens. 
@@ -62,7 +64,7 @@ Screen Manager:
         function on the screen to insure there are no duplicates
     
     pop()
-        sets the screen's visibilty to false and uses the lists pop() function
+        sets the screen's visibility to false and uses the lists pop() function
         on the tail of the list
     
     remove(screen)
