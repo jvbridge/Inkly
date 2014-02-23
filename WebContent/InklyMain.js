@@ -17,71 +17,32 @@ gInput.addBool(51, "yellow");
 gInput.addBool(32, "jump");
 gInput.addBool(27, "escape");
 
-/*
- * this code has been commented out since we don't need to spawn inky yet in 
- * this point in the development 
 
-// constructor for making inky
-function inky(){
-	//PLACEHOLDER current sprite spawning. Not used here in final version
-	inkySprite = new Sprite();
-	inkySprite.x = 20;
-	inkySprite.y = canvas.height - 60;
-	inkySprite.height = 40;
-	inkySprite.width = 40;
-	//temporary place holder until we get the next image
-	inkySprite.image = Textures.load("Inky.png");
-	this.Sprite = inkySprite;
-}
-
-//create inky
-inky = new inky();
-
-//update function for inky
-inky.Sprite.update = function(d){
-	if (gInput.jump){
-		console.log("jump!");
-		this.y -= 2;
-	}
-	if (gInput.cyan){
-		console.log("cyan!");
-	}
-	if (gInput.yellow){
-		console.log("yellow!");
-	}
-	if (gInput.magenta){
-		console.log("magenta!");
-	} 
-	this.y += 1;
-}
 
 /****************************************************************************/
-/* 							MENUS and Manager								*/
+/* 								MENUS and Manager							*/
 /****************************************************************************/
 
-/*
+/**
  * this part is where the code to make all screens (menus and such) are here
  * most of this code is copied from the example JS fiddle for screen 
  * management and sprite movement: http://jsfiddle.net/Selkcip/BMAam/ and then
- * modified to fit our needs
+ * modified to fit our needs. 
+ * 
+ * For documentation on the functions and objects see: 
+ * Documentation/Menus_and_Manager.txt
  */
 
-//screen constructor
 function Screen(alwaysUpdate, alwaysDraw){
 	//sprite constructor called to copy any applicable object properties
 	//this also refers to the line after the constructor  
 	Sprite.call(this);
-	
-	//args here for determining if the screen should update or not
+
 	this.alwaysUpdate = alwaysUpdate;
 	this.alwaysDraw = alwaysDraw;
 	
-	/* this booleon is used to determine if the screen has been initialized or
-	 * not, it is assumed that the screen has not been initialized
-	 */
 	this.initialized = false;
 	
-	//stage is our sprite for the backgrounds
 	this.Stage = new Sprite();
 	this.addChild(this.Stage);
 	
@@ -92,28 +53,16 @@ function Screen(alwaysUpdate, alwaysDraw){
 //This allows the Screen class to inherit all sprite properties 
 Screen.prototype = new Sprite();
 
-Screen.prototype.init = function(){
-};
+Screen.prototype.init = function(){};
 
-
-/*
- * this is the screen manager class. It contains a list of all screens to use
- * as well as a series of functions to make said classes
- */
 function ScreenManager(){
 	//Call sprite constructor to inheret sprite properties
 	Sprite.call(this);
-	
-	//list of all screens, data structure type is a stack
+
 	this.screens = new List();
 }
 //inherit all sprite properties just like each screen
 ScreenManager.prototype = new Sprite();
-
-/*
- * these functions are all used to push, pop, or remove screens from the 
- * ScreenManager stack, and are named as such. 
- */
 
 ScreenManager.prototype.push = function(screen){
     this.screens.remove(screen);
@@ -135,9 +84,6 @@ ScreenManager.prototype.update = function (d) {
 	//simply an easy reference
     var screens = this.screens;
     
-    /* Loop through the screens and update if they are supposed to always 
-     * update or if they are the top screen
-     */
     for (var node = screens.head; node != null; node = node.link) {
         //makes a reference for easy reference to the node
     	var screen = node.item;
@@ -151,7 +97,6 @@ ScreenManager.prototype.update = function (d) {
         }else{
             screen.gui.visible = true;
         }
-        //sets the appropriate screen when needed.
         if (screen.alwaysUpdate || node == screens.tail) {
             if(!screen.initialized){
                 screen.init();
@@ -162,9 +107,6 @@ ScreenManager.prototype.update = function (d) {
     }
 };
 
-//The draw function needs to be overridden as well to mimic the update 
-//function except this checks alwaysDraw instead of alwaysUpdate
-//TODO: understand ctx
 ScreenManager.prototype.draw = function (ctx) {
     var screens = this.screens;
     
@@ -176,16 +118,14 @@ ScreenManager.prototype.draw = function (ctx) {
     }
 };
 
-// this is the part for running the game. Specific management works here best
 var screenManager = new ScreenManager();
 
-//Sceen Manager has inhereted sprite properties so it can be added to the world
 world.addChild(screenManager);
 
 //creates the main menu screen. 
 
 //TODO: set to false when game is shipped
-var mainMenu = new Screen(true,true);
+var mainMenu = new Screen(false,false);
 
 mainMenu.image = Textures.load("MainMenu.png");
 screenManager.push(mainMenu);
@@ -233,7 +173,13 @@ mainMenu.init = function(){
     resumeGame.setLabelColors("#aaaaaa", "#ffffff", "#ff0000");
     this.gui.addChild(resumeGame);
     
-    var credits = new T
+    var credits = new TextButton("Credits");
+    credits.y = 100;
+    credits.center = true;
+    credits.label.dropShadow = true;
+    credits.label.fontSize = 30;
+    credits.setLabelColors("#aaaaaa", "#ffffff", "#ff0000");
+    this.gui.addChild(credits);
 
 }
 
@@ -246,9 +192,9 @@ gameScreen.init = function(){
     //Since we set a background we want the screen to fill  the canvas
     this.width = canvas.width;
     this.height = canvas.height;
-    /*
-     * TODO: put all in game stuff here
-     */
+    // TODO: put all in game stuff here
+    
+    this.Stage.addChild(inky.Sprite);
 }
 
 var pauseMenu = new Screen(false, true);
@@ -286,7 +232,8 @@ pauseMenu.init = function(){
 
 //This makes it so that escape will make the pause screen
 gInput.addFunc(27, function(){
-    if(screenManager.screens.find(gameScreen) && !screenManager.screens.find(pauseMenu)){
+    if(screenManager.screens.find(gameScreen) && 
+    		!screenManager.screens.find(pauseMenu)){
         screenManager.push(pauseMenu);
     }
 })
@@ -300,4 +247,43 @@ settingsMenu.init = function(){
 	this.gui.x = canvas.width/2;
     this.gui.y = canvas.height/2;
 	//TODO add buttons here
+}
+
+/****************************************************************************/
+/*					Definition of objects and Sprites						*/
+/****************************************************************************/
+
+// constructor for making inky
+function inky(){
+	//PLACEHOLDER current sprite spawning. Not used here in final version
+	inkySprite = new Sprite();
+	inkySprite.x = 20;
+	inkySprite.y = canvas.height - 60;
+	inkySprite.height = 40;
+	inkySprite.width = 40;
+	//temporary place holder until we get the next image
+	inkySprite.image = Textures.load("Inky.png");
+	this.Sprite = inkySprite;
+}
+
+//create inky
+inky = new inky();
+
+//update function for inky
+inky.Sprite.update = function(d){
+	if (gInput.jump){
+		console.log("jump!");
+		this.y -= 2;
+	}
+	if (gInput.cyan){
+		console.log("cyan!");
+	}
+	if (gInput.yellow){
+		console.log("yellow!");
+	}
+	if (gInput.magenta){
+		console.log("magenta!");
+	}
+	//Inky usually falls if not given anything
+	this.y += 1;
 }

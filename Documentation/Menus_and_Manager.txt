@@ -1,0 +1,70 @@
+This is the documentation of how menus and the manager works
+
+Screen:
+
+    Arguments:
+
+    alwaysDraw
+        boolean that sets the alwaysDraw boolean in the object
+        
+    alwaysUpdate
+        boolean that sets the alwaysUpdate boolean in the object
+        
+    Objects:
+    
+    alwaysDraw
+        Boolean that if true means the screen will always draw even when it is
+        not the screen that the player can see. If false the screen only
+        draws when it is on top. 
+    
+    alwaysUpdate
+        Boolean that if true means the screen will always update even when it
+        is not hte screen that the player can see. If false the screen only
+        updates when it is on top. 
+    
+    initialized
+    
+    Stage
+        Sprite used for each of the screens. 
+    
+    Functions:
+    
+    init()
+        Empty initialize function that is called when screen is first made.
+        Should be overridden for each screen with a new function. 
+
+Screen Manager:
+    The screen manager is an object that contains a list of all screens, and
+    determines which screen is on top and how they're updated. The name of the
+    screen manager used in Inkly is screenManager. ScreenManager.prototype is
+    a sprite used so that the ScreenManager class can have all the proterties 
+    of a sprite.
+    
+    Objects:
+    
+    screens
+        A list containing all screens the game has.
+    
+    Functions:
+    draw()
+        a loop that iterates over every screen in the list and calls their 
+        draw() function if the screen's alwaysDraw boolean is true or if 
+        they're the last screen in the list. This function is auto called, so 
+        it shouldn't be called anywhere in InklyMain.js.
+    
+    update()
+        a loop that iterates over every screen in the list and calls their
+        update() function if the screens alwaysUpdate boolean is true or if
+        they're the last screen in the list.
+        
+    push(screen)
+        pushes the screen onto the list after calling the list's remove
+        function on the screen to insure there are no duplicates
+    
+    pop()
+        sets the screen's visibilty to false and uses the lists pop() function
+        on the tail of the list
+    
+    remove(screen)
+        sets the screen's visibility to false as well as call's the list's 
+        remove() function on the screen.
