@@ -28,8 +28,8 @@ background.x = 0;
 background.y = 0;
 
 palette = new Sprite;
-palette.width = 100;
-palette.height = 100;
+palette.width = 200;
+palette.height = 200;
 palette.x = canvas.width / 2 - palette.width / 2;
 palette.y = 10;
 palette.image = Textures.load("0.jpg");
@@ -215,7 +215,6 @@ gameScreen.init = function() {
 
 	this.Stage.addChild(inky.Sprite);
 	this.Stage.addChild(palette)
-
 	this.Stage.addChild(background)
 }
 
@@ -348,7 +347,8 @@ inky.Sprite.update = function(d) {
 	var collide = false;
 
 	for (var i = 0; i < platforms.length; i++) {
-		if (spriteCollide(platforms[i].sprite) && !gInput.jump) {
+		if (spriteCollide(platforms[i].sprite) && !gInput.jump
+				&& platforms[i].tangible) {
 			inky.velocity = 0;
 		}
 	}
@@ -404,17 +404,23 @@ function getX(sprite) {
 	return sprite.x + background.x;
 }
 
-//gets the y value of a sprite relative to the stage
+// gets the y value of a sprite relative to the stage
 function getY(sprite) {
 	return sprite.y + background.y;
 }
 
+// updates all the platfroms with the appropriate colors
+function updatePlatforms() {
+	for (var i = 0; i < platforms.length; i++) {
+		if (colorMode == platforms[i].color) {
+			platforms[i].tangible = false;
+			// TODO: change texture
+		} else {
+			platforms[i].tangible = true;
+		}
+	}
 
-//updates all the platfroms with the appropriate colors
-function updatePlatforms(){
-	
 }
-
 
 // returns true if Inky is colliding with a sprite, false if it's not
 function spriteCollide(sprite) {
