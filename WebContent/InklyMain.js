@@ -16,6 +16,18 @@ gInput.addBool(51, "yellow");
 gInput.addBool(32, "jump");
 gInput.addBool(27, "escape");
 
+/*
+ * TODO: reformat this when we get new structure
+ * background is the sprite which all things are added to. When the "camera"
+ * moves, what's really happening is that the background is moving in the 
+ * opposite direction
+ */
+background = new Sprite
+background.width = 1000;
+background.height = 1000;
+background.x = 0;
+background.y = 0;
+
 var platforms = new Array();
 
 var gravity = 8;
@@ -194,6 +206,7 @@ gameScreen.init = function() {
 	// TODO: put all in game stuff here
 
 	this.Stage.addChild(inky.Sprite);
+	this.Stage.addChild(background)
 }
 
 var pauseMenu = new Screen(false, true);
@@ -320,6 +333,8 @@ inky.Sprite.update = function(d) {
 
 	//this changes inky's location finally
 	this.y += inky.velocity;
+	
+	background.x -= 1;
 }
 
 function platform(x, y, color) {
@@ -349,7 +364,7 @@ function platform(x, y, color) {
 
 	this.sprite = platSprite;
 
-	gameScreen.Stage.addChild(platSprite);
+	background.addChild(platSprite);
 
 	platforms.push(this);
 
@@ -362,6 +377,17 @@ platform.update = function(d) {
 /* Helper functions */
 /** ************************************************************************* */
 
+
+//gets the x value of a sprite relative to the Stage rather than the 
+function getX(sprite){
+	return sprite.x + background.x;
+}
+
+function getY(sprite){
+	return sprite.y + background.y;
+}
+
+
 // returns true if Inky is colliding with a sprite, false if it's not
 function spriteCollide(sprite) {
 
@@ -370,10 +396,10 @@ function spriteCollide(sprite) {
 	var inkyTop = inky.Sprite.y;
 	var inkyBottom = inky.Sprite.y + inky.Sprite.height;
 
-	var spriteLeft = sprite.x;
-	var spriteRight = sprite.x + sprite.width;
-	var spriteTop = sprite.y;
-	var spriteBottom = sprite.y + sprite.height;
+	var spriteLeft = getX(sprite);
+	var spriteRight = getX(sprite) + sprite.width;
+	var spriteTop = getY(sprite);
+	var spriteBottom = getY(sprite) + sprite.height;
 
 	// true if inky's left is in the same x coordinates as the sprite
 	var leftCollide;
@@ -424,6 +450,8 @@ function spriteCollide(sprite) {
 	}
 
 }
+
+
 
 
 new platform(0, canvas.height - 30, "cyan");
