@@ -1,0 +1,14 @@
+Objects
+
+platforms:
+    this is an array that contains all of the platforms. 
+    
+inky: 
+    Our fearless hero. Who probably will die... a lot. All things that need to
+    update in the game should have inky 
+    
+gravity:
+    integer representing the number of pixels inky falls per update cycle 
+    
+Functions:
+

@@ -42,7 +42,7 @@ Screen Manager:
     a sprite used so that the ScreenManager class can have all the proterties 
     of a sprite.
     
-    Objects:
+    Properties:
     
     screens
         A list containing all screens the game has.
