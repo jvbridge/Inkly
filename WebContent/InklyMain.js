@@ -60,13 +60,13 @@ var terminalVelocity = 8;
 var counter = 0;
 
 // variable for calculating Inky's jump height
-var jumpHeight = 50;
+var jumpHeight = 30;
 
 // variable for calculating how fast inky jumps (lower is faster)
 var jumpSpeed = -16;
 
 // how fast the level moves
-var runSpeed = 5;
+var runSpeed = 2;
 
 /** ************************************************************************ */
 /* MENUS and Manager */
@@ -346,19 +346,20 @@ inky.Sprite.update = function(d) {
 	// This is for falling
 	if (inky.velocity < terminalVelocity) {
 		inky.velocity += gravity;
-		console.log(inky.velocity);
 	}
 
+	// inky jumping
 	if (gInput.jump) {
-		console.log("jump!");
 
 		if (counter - inky.jumpStart < jumpHeight) {
 			inky.velocity = jumpSpeed;
+			console.log("jump start!");
 		}
 
 		if (platformCollide() || jumpCollide()) {
 			inky.jumpStart = counter;
 			inky.velocity = jumpSpeed;
+			console.log("boing!");
 		}
 	}
 	if (gInput.cyan) {
@@ -392,11 +393,16 @@ inky.Sprite.update = function(d) {
 			inky.velocity = 0;
 		}
 	}
+	for (var i = 0; i < jumppables.length; i++) {
+		if (spriteCollide(jumppables[i].sprite) && !gInput.jump)
+			inky.velocity = 0;
+	}
 
 	// this changes inky's location finally
 	this.y += inky.velocity;
 
 	background.x -= runSpeed;
+
 	tick();
 }
 
@@ -549,7 +555,7 @@ function spriteCollide(sprite) {
 		// console.log("left + bottom!");
 		return true;
 	}
-
+	return false;
 }
 
 /*
@@ -557,11 +563,12 @@ function spriteCollide(sprite) {
  */
 function platformCollide() {
 	for (var i = 0; i < platforms.length; i++) {
-		if (spriteCollide(platforms[i].sprite && platforms[i].tangible))
+		if (spriteCollide(platforms[i].sprite) && platforms[i].tangible) {
 			return true;
-		else
-			return false;
+		}
+		console.log(spriteCollide(platforms[i].sprite));
 	}
+	return false;
 }
 
 /*
@@ -570,16 +577,23 @@ function platformCollide() {
  */
 function jumpCollide() {
 	for (i = 0; i < jumppables.length; i++) {
-		if (spriteCollide(jumppables[i].sprite))
+		if (spriteCollide(jumppables[i].sprite)) {
+			console.log("jumppable jump!")
 			return true;
-		else
-			return false;
+		}
 	}
+	return false;
 }
 
-new floor(0, 500);
+// new floor(0, 500);
 
-new platform(500, 450, "cyan");
-new platform(700, canvas.height - 70, "magenta");
-new platform(750, canvas.height - 30, "yellow");
-new platform(860, canvas.height - 80, "black");
+new platform(0, 450, "cyan");
+new platform(100, 450, "cyan");
+new platform(200, 450, "black");
+new platform(300, 450, "cyan");
+new platform(400, 450, "cyan");
+
+new platform(500, 450, "black");
+new platform(700, 310, "magenta");
+new platform(750, 320, "yellow");
+new platform(860, 200, "black");
