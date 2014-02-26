@@ -1,5 +1,9 @@
 Implement JSON level reader
 Implment first level
 
-
 Death counter
+
+Make separete rules for each level (make each level's specifications in a 
+    single function)
+    
+update architecture based on my recent revisions

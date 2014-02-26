@@ -17,16 +17,24 @@ gInput.addBool(32, "jump");
 gInput.addBool(27, "escape");
 
 /*
- * TODO: reformat this when we get new structure
- * background is the sprite which all things are added to. When the "camera"
- * moves, what's really happening is that the background is moving in the 
- * opposite direction
+ * TODO: reformat this when we get new structure background is the sprite which
+ * all things are added to. When the "camera" moves, what's really happening is
+ * that the background is moving in the opposite direction
  */
-background = new Sprite
+background = new Sprite;
 background.width = 1000;
 background.height = 1000;
 background.x = 0;
 background.y = 0;
+
+palette = new Sprite;
+palette.width = 100;
+palette.height = 100;
+palette.x = canvas.width / 2 - palette.width / 2;
+palette.y = 10;
+palette.image = Textures.load("0.jpg");
+
+var colorMode = "none";
 
 var platforms = new Array();
 
@@ -206,6 +214,8 @@ gameScreen.init = function() {
 	// TODO: put all in game stuff here
 
 	this.Stage.addChild(inky.Sprite);
+	this.Stage.addChild(palette)
+
 	this.Stage.addChild(background)
 }
 
@@ -282,14 +292,14 @@ function inky() {
 	 * modified by functions
 	 */
 	var velocity = 0;
-	
+
 	/*
 	 * integers used to compare inky's previous location with its current one
 	 * useful for collision detection
-	 */ 
+	 */
 	previousX = inkySprite.x;
 	previousY = inkySprite.y;
-	
+
 }
 
 // create inky
@@ -297,28 +307,40 @@ inky = new inky();
 
 // update function for inky
 inky.Sprite.update = function(d) {
-	
+
 	/*
-	 * these lines should ALWAYS be first. Also all movement of sprite has 
+	 * these lines should ALWAYS be first. Also all movement of sprite has
 	 * should be defined here, do NOT move anything from anywhere else.
 	 */
 	inky.previousX = this.x
 	inky.previousY = this.y;
-	
+
 	inky.velocity = gravity;
-	
+
 	if (gInput.jump) {
 		console.log("jump!");
 		// this.y -= 16;
 		inky.velocity = -16;
 	}
 	if (gInput.cyan) {
+		colorMode = "cyan";
+		updatePlatforms();
+		palette.image = Textures.load("2.jpg");
+		gameScreen.image = Textures.load("BackgroundC.png");
 		console.log("cyan!");
 	}
 	if (gInput.yellow) {
+		colorMode = "yellow";
+		updatePlatforms();
+		palette.image = Textures.load("3.jpg");
+		gameScreen.image = Textures.load("BackgroundY.png");
 		console.log("yellow!");
 	}
 	if (gInput.magenta) {
+		colorMode = "magenta"
+		updatePlatforms();
+		palette.image = Textures.load("1.jpg");
+		gameScreen.image = Textures.load("BackgroundM.png");
 		console.log("magenta!");
 	}
 
@@ -331,9 +353,9 @@ inky.Sprite.update = function(d) {
 		}
 	}
 
-	//this changes inky's location finally
+	// this changes inky's location finally
 	this.y += inky.velocity;
-	
+
 	background.x -= 1;
 }
 
@@ -341,7 +363,7 @@ function platform(x, y, color) {
 	/*
 	 * generates sprite and returns object sprite has left, right,
 	 */
-	this.tangible = false;
+	this.tangible = true;
 	this.color = color;
 	this.x = x;
 	this.y = y;
@@ -377,14 +399,20 @@ platform.update = function(d) {
 /* Helper functions */
 /** ************************************************************************* */
 
-
-//gets the x value of a sprite relative to the Stage rather than the 
-function getX(sprite){
+// gets the x value of a sprite relative to the Stage
+function getX(sprite) {
 	return sprite.x + background.x;
 }
 
-function getY(sprite){
+//gets the y value of a sprite relative to the stage
+function getY(sprite) {
 	return sprite.y + background.y;
+}
+
+
+//updates all the platfroms with the appropriate colors
+function updatePlatforms(){
+	
 }
 
 
@@ -451,10 +479,7 @@ function spriteCollide(sprite) {
 
 }
 
-
-
-
-new platform(0, canvas.height - 30, "cyan");
+new platform(0, 450, "cyan");
 new platform(200, canvas.height - 70, "magenta");
 new platform(250, canvas.height - 30, "yellow");
 new platform(360, canvas.height - 80, "black");
