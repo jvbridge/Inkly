@@ -34,14 +34,7 @@ palette.x = canvas.width / 2 - palette.width / 2;
 palette.y = 10;
 palette.image = Textures.load("0.jpg");
 
-/** ************************************************************************* */
-/* GLOBAL VARIABLES */
-/** ************************************************************************* */
-
-// variable for the color mode
-var colorMode = "none";
-
-// array to reference all platforms
+//array to reference all platforms
 var platforms = new Array();
 
 // array to reference all objects that can be collided with
@@ -50,23 +43,37 @@ var collidables = new Array();
 // array to reference all things that inky can jump on
 var jumppables = new Array();
 
+//counter that says how long game has been going
+var counter = 0;
+
+/** ************************************************************************* */
+/* GLOBAL VARIABLES */
+/** ************************************************************************* */
+
+// variable for the color mode
+var colorMode = "none";
+var COLOR_MODE_DEFAULT = "none";
+
 // rate at which velocity changes
 var gravity = 2;
+var GRAVITY_DEFAULT = 2;
 
 // fastest inky can fall
 var terminalVelocity = 8;
+var TERMINAL_VELOCITY_DEFAULT = 8
 
-// counter that says how long game has been going
-var counter = 0;
 
 // variable for calculating Inky's jump height
-var jumpHeight = 30;
+var jumpHeight = 15;
+var JUMP_HEIGHT_DEFAULT = 15;
 
 // variable for calculating how fast inky jumps (lower is faster)
 var jumpSpeed = -16;
+var JUMP_SPEED_DEFAULT = -16
 
 // how fast the level moves
 var runSpeed = 2;
+var RUN_SPEED_DEFAULT = 2;
 
 /** ************************************************************************ */
 /* MENUS and Manager */
@@ -343,7 +350,7 @@ inky.Sprite.update = function(d) {
 	inky.previousX = this.x
 	inky.previousY = this.y;
 
-	// This is for falling
+	// This is for falling appropriate code goes here
 	if (inky.velocity < terminalVelocity) {
 		inky.velocity += gravity;
 	}
@@ -585,13 +592,7 @@ function jumpCollide() {
 	return false;
 }
 
-// new floor(0, 500);
-
-new platform(0, 450, "cyan");
-new platform(100, 450, "cyan");
-new platform(200, 450, "black");
-new platform(300, 450, "cyan");
-new platform(400, 450, "cyan");
+new floor(0, 500);
 
 new platform(500, 450, "black");
 new platform(700, 310, "magenta");
