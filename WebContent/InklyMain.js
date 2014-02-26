@@ -22,7 +22,7 @@ gInput.addBool(27, "escape");
  * that the background is moving in the opposite direction
  */
 background = new Sprite;
-background.width = 1000;
+background.width = 100000; // arbitrarily long number
 background.height = 1000;
 background.x = 0;
 background.y = 0;
@@ -34,15 +34,43 @@ palette.x = canvas.width / 2 - palette.width / 2;
 palette.y = 10;
 palette.image = Textures.load("0.jpg");
 
+/** ************************************************************************* */
+/* GLOBAL VARIABLES */
+/** ************************************************************************* */
+
+// variable for the color mode
 var colorMode = "none";
 
+// array to reference all platforms
 var platforms = new Array();
 
-var gravity = 8;
+// array to reference all objects that can be collided with
+var collidables = new Array();
 
-/** ************************************************************************* */
+// array to reference all things that inky can jump on
+var jumppables = new Array();
+
+// rate at which velocity changes
+var gravity = 2;
+
+// fastest inky can fall
+var terminalVelocity = 8;
+
+// counter that says how long game has been going
+var counter = 0;
+
+// variable for calculating Inky's jump height
+var jumpHeight = 50;
+
+// variable for calculating how fast inky jumps (lower is faster)
+var jumpSpeed = -16;
+
+// how fast the level moves
+var runSpeed = 5;
+
+/** ************************************************************************ */
 /* MENUS and Manager */
-/** ************************************************************************* */
+/** ************************************************************************ */
 
 /**
  * this part is where the code to make all screens (menus and such) are here
@@ -270,9 +298,9 @@ settingsMenu.init = function() {
 	// TODO add buttons here
 }
 
-/** ************************************************************************* */
+/** ************************************************************************ */
 /* Definition of objects and Sprites */
-/** ************************************************************************* */
+/** ************************************************************************ */
 
 // constructor for making inky
 function inky() {
@@ -290,7 +318,7 @@ function inky() {
 	 * int that holds inky's velocity. This is updated each update loop and is
 	 * modified by functions
 	 */
-	var velocity = 0;
+	this.velocity = 0;
 
 	/*
 	 * integers used to compare inky's previous location with its current one
@@ -299,6 +327,7 @@ function inky() {
 	previousX = inkySprite.x;
 	previousY = inkySprite.y;
 
+	this.jumpStart = 0;
 }
 
 // create inky
@@ -314,12 +343,23 @@ inky.Sprite.update = function(d) {
 	inky.previousX = this.x
 	inky.previousY = this.y;
 
-	inky.velocity = gravity;
+	// This is for falling
+	if (inky.velocity < terminalVelocity) {
+		inky.velocity += gravity;
+		console.log(inky.velocity);
+	}
 
 	if (gInput.jump) {
 		console.log("jump!");
-		// this.y -= 16;
-		inky.velocity = -16;
+
+		if (counter - inky.jumpStart < jumpHeight) {
+			inky.velocity = jumpSpeed;
+		}
+
+		if (platformCollide() || jumpCollide()) {
+			inky.jumpStart = counter;
+			inky.velocity = jumpSpeed;
+		}
 	}
 	if (gInput.cyan) {
 		colorMode = "cyan";
@@ -356,7 +396,8 @@ inky.Sprite.update = function(d) {
 	// this changes inky's location finally
 	this.y += inky.velocity;
 
-	background.x -= 1;
+	background.x -= runSpeed;
+	tick();
 }
 
 function platform(x, y, color) {
@@ -389,15 +430,41 @@ function platform(x, y, color) {
 	background.addChild(platSprite);
 
 	platforms.push(this);
+	collidables.push(this);
+
+}
+
+function floor(start, end) {
+
+	this.start = start;
+	this.end = end;
+
+	floorSprite = new Sprite;
+	floorSprite.x = start;
+	floorSprite.y = canvas.height - 30;
+	floorSprite.height = 30;
+	floorSprite.width = (end - start);
+	floorSprite.image = Textures.load("PlatformB.gif");
+
+	this.sprite = floorSprite;
+
+	background.addChild(floorSprite);
+
+	collidables.push(this);
+	jumppables.push(this);
 
 }
 
 platform.update = function(d) {
 	// spriteCollide(this.sprite);
 }
-/** ************************************************************************* */
+/** ************************************************************************ */
 /* Helper functions */
-/** ************************************************************************* */
+/** ************************************************************************ */
+
+function tick() {
+	counter += 1;
+}
 
 // gets the x value of a sprite relative to the Stage
 function getX(sprite) {
@@ -485,7 +552,34 @@ function spriteCollide(sprite) {
 
 }
 
-new platform(0, 450, "cyan");
-new platform(200, canvas.height - 70, "magenta");
-new platform(250, canvas.height - 30, "yellow");
-new platform(360, canvas.height - 80, "black");
+/*
+ * returns true if inky is colliding with a tangible platform, false if it's not
+ */
+function platformCollide() {
+	for (var i = 0; i < platforms.length; i++) {
+		if (spriteCollide(platforms[i].sprite && platforms[i].tangible))
+			return true;
+		else
+			return false;
+	}
+}
+
+/*
+ * returns true if inky is colliding with an object it can jump on that is not a
+ * platform
+ */
+function jumpCollide() {
+	for (i = 0; i < jumppables.length; i++) {
+		if (spriteCollide(jumppables[i].sprite))
+			return true;
+		else
+			return false;
+	}
+}
+
+new floor(0, 500);
+
+new platform(500, 450, "cyan");
+new platform(700, canvas.height - 70, "magenta");
+new platform(750, canvas.height - 30, "yellow");
+new platform(860, canvas.height - 80, "black");
