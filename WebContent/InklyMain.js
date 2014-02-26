@@ -263,6 +263,20 @@ function inky() {
 	// temporary place holder until we get the next image
 	inkySprite.image = Textures.load("Inky.png");
 	this.Sprite = inkySprite;
+
+	/*
+	 * int that holds inky's velocity. This is updated each update loop and is
+	 * modified by functions
+	 */
+	var velocity = 0;
+	
+	/*
+	 * integers used to compare inky's previous location with its current one
+	 * useful for collision detection
+	 */ 
+	previousX = inkySprite.x;
+	previousY = inkySprite.y;
+	
 }
 
 // create inky
@@ -270,9 +284,20 @@ inky = new inky();
 
 // update function for inky
 inky.Sprite.update = function(d) {
+	
+	/*
+	 * these lines should ALWAYS be first. Also all movement of sprite has 
+	 * should be defined here, do NOT move anything from anywhere else.
+	 */
+	inky.previousX = this.x
+	inky.previousY = this.y;
+	
+	inky.velocity = gravity;
+	
 	if (gInput.jump) {
 		console.log("jump!");
-		this.y -= 16;
+		// this.y -= 16;
+		inky.velocity = -16;
 	}
 	if (gInput.cyan) {
 		console.log("cyan!");
@@ -283,21 +308,18 @@ inky.Sprite.update = function(d) {
 	if (gInput.magenta) {
 		console.log("magenta!");
 	}
-	// Inky usually falls if not given anything
 
-	var falling = true;
+	// this loop detects if Inky is touching anything
+	var collide = false;
 
 	for (var i = 0; i < platforms.length; i++) {
-		if (spriteCollide(platforms[i].sprite)) {
-			falling = false;
+		if (spriteCollide(platforms[i].sprite) && !gInput.jump) {
+			inky.velocity = 0;
 		}
 	}
 
-	if (falling)
-		this.y += gravity;
-
-	this.x += 1;
-
+	//this changes inky's location finally
+	this.y += inky.velocity;
 }
 
 function platform(x, y, color) {
@@ -340,7 +362,7 @@ platform.update = function(d) {
 /* Helper functions */
 /** ************************************************************************* */
 
-// returns side sprite is colliding, returns "none" if sprites aren't colliding
+// returns true if Inky is colliding with a sprite, false if it's not
 function spriteCollide(sprite) {
 
 	var inkyLeft = inky.Sprite.x;
@@ -382,41 +404,27 @@ function spriteCollide(sprite) {
 		topCollide = false;
 
 	if (rightCollide && bottomCollide) {
-		console.log("right + bottom!");
+		// console.log("right + bottom!");
 		return true;
 	}
 
 	if (leftCollide && bottomCollide) {
-		console.log("left + bottom!");
+		// console.log("left + bottom!");
 		return true;
 	}
 
 	if (rightCollide && topCollide) {
-		console.log("right + top!");
+		// console.log("right + top!");
 		return true;
 	}
 
 	if (leftCollide && topCollide) {
-		console.log("left + bottom!");
+		// console.log("left + bottom!");
 		return true;
 	}
 
-	/*
-	 * //Inky runs into something from the left hand side if(inkyRight >=
-	 * spriteLeft && inkyRight <= spriteRight && inkyTop <= spriteBottom &&
-	 * inkyBottom >= spriteTop){ console.log("Inky ran into something!") return
-	 * true; }
-	 * 
-	 * //inky lands on an object if(inkyBottom >= spriteTop && inkyTop <=
-	 * spriteTop && ((inkyLeft <= spriteRight && inkyLeft >= spriteLeft) ||
-	 * (inkyRight >= spriteLeft && inkyRight <= spriteRight))){
-	 * console.log("Inky landed on something!") return true; } //inky hits an
-	 * object from below if(inkyTop <= spriteBottom && ( (inkyLeft <=
-	 * spriteRight && inkyLeft >= spriteLeft) || (inkyRight >= spriteLeft &&
-	 * inkyRight <= spriteRight))){ console.log("Inky bumped its head on
-	 * something!") return true; }
-	 */
 }
+
 
 new platform(0, canvas.height - 30, "cyan");
 new platform(200, canvas.height - 70, "magenta");
