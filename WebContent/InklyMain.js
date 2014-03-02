@@ -1,7 +1,6 @@
-/**
- * This is the main javascript file. It should be treated as the initialization
- * function
- */
+/*******************************************************************************
+ * GAME INITIALIZATION
+ ******************************************************************************/
 use2D = true;
 initGame("myCanvas");
 
@@ -34,6 +33,9 @@ palette.x = canvas.width / 2 - palette.width / 2;
 palette.y = 10;
 palette.image = Textures.load("0.png");
 
+/*******************************************************************************
+ * ARRAYS
+ ******************************************************************************/
 // array to reference all platforms
 var platforms = new Array();
 
@@ -43,8 +45,6 @@ var collidables = new Array();
 // array to reference all things that inky can jump on
 var jumpables = new Array();
 
-// counter that says how long game has been going
-var counter = 0;
 
 /** ************************************************************************* */
 /* GLOBAL VARIABLES */
@@ -74,6 +74,14 @@ var JUMP_SPEED_DEFAULT = -16
 var runSpeed = 3;
 var RUN_SPEED_DEFAULT = 3;
 
+/*****************************************************************************
+ * COUNTERS
+ ****************************************************************************/
+
+//counter that says how long game has been going
+var counter = 0;
+
+var deaths = 0;
 
 /** ************************************************************************ */
 /* MENUS and Manager */
@@ -593,7 +601,8 @@ function jumpCollide() {
 	return false;
 }
 
-//clears all sprites from the level and frees the arrays that reference them
+// clears all sprites from the level and frees the arrays that reference them
+//TODO: test this function
 function clearLevel() {
 	for (var i = 0; i < collidables.length; i++) {
 		collidables[i].sprite.visible = false;
@@ -607,6 +616,12 @@ function clearLevel() {
 	for (var i = 0; i < jumpables.length; i++) {
 		jumpables.pop();
 	}
+}
+
+
+//TODO complete function
+function death(){
+	
 }
 
 new floor(0, 500);
