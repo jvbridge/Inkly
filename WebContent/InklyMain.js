@@ -32,18 +32,18 @@ palette.width = 200;
 palette.height = 200;
 palette.x = canvas.width / 2 - palette.width / 2;
 palette.y = 10;
-palette.image = Textures.load("0.jpg");
+palette.image = Textures.load("0.png");
 
-//array to reference all platforms
+// array to reference all platforms
 var platforms = new Array();
 
 // array to reference all objects that can be collided with
 var collidables = new Array();
 
 // array to reference all things that inky can jump on
-var jumppables = new Array();
+var jumpables = new Array();
 
-//counter that says how long game has been going
+// counter that says how long game has been going
 var counter = 0;
 
 /** ************************************************************************* */
@@ -62,7 +62,6 @@ var GRAVITY_DEFAULT = 2;
 var terminalVelocity = 8;
 var TERMINAL_VELOCITY_DEFAULT = 8
 
-
 // variable for calculating Inky's jump height
 var jumpHeight = 15;
 var JUMP_HEIGHT_DEFAULT = 15;
@@ -72,8 +71,9 @@ var jumpSpeed = -16;
 var JUMP_SPEED_DEFAULT = -16
 
 // how fast the level moves
-var runSpeed = 2;
-var RUN_SPEED_DEFAULT = 2;
+var runSpeed = 3;
+var RUN_SPEED_DEFAULT = 3;
+
 
 /** ************************************************************************ */
 /* MENUS and Manager */
@@ -113,7 +113,7 @@ Screen.prototype.init = function() {
 };
 
 function ScreenManager() {
-	// Call sprite constructor to inheret sprite properties
+	// Call sprite constructor to inherit sprite properties
 	Sprite.call(this);
 
 	this.screens = new List();
@@ -210,6 +210,7 @@ mainMenu.init = function() {
 	 * mainMenu.stage.addChild(logo);
 	 */
 	var newGame = new TextButton("New Game");
+	newGame.y = 067;
 	newGame.center = true;
 	newGame.label.dropShadow = true;
 	newGame.label.fontSize = 30;
@@ -221,7 +222,7 @@ mainMenu.init = function() {
 	}
 
 	var resumeGame = new TextButton("Resume Game");
-	resumeGame.y = 50;
+	resumeGame.y = 133;
 	resumeGame.center = true;
 	resumeGame.label.dropShadow = true;
 	resumeGame.label.fontSize = 30;
@@ -229,7 +230,7 @@ mainMenu.init = function() {
 	this.gui.addChild(resumeGame);
 
 	var credits = new TextButton("Credits");
-	credits.y = 100;
+	credits.y = 197;
 	credits.center = true;
 	credits.label.dropShadow = true;
 	credits.label.fontSize = 30;
@@ -372,21 +373,21 @@ inky.Sprite.update = function(d) {
 	if (gInput.cyan) {
 		colorMode = "cyan";
 		updatePlatforms();
-		palette.image = Textures.load("2.jpg");
+		palette.image = Textures.load("2.png");
 		gameScreen.image = Textures.load("BackgroundC.png");
 		console.log("cyan!");
 	}
 	if (gInput.yellow) {
 		colorMode = "yellow";
 		updatePlatforms();
-		palette.image = Textures.load("3.jpg");
+		palette.image = Textures.load("3.png");
 		gameScreen.image = Textures.load("BackgroundY.png");
 		console.log("yellow!");
 	}
 	if (gInput.magenta) {
 		colorMode = "magenta"
 		updatePlatforms();
-		palette.image = Textures.load("1.jpg");
+		palette.image = Textures.load("1.png");
 		gameScreen.image = Textures.load("BackgroundM.png");
 		console.log("magenta!");
 	}
@@ -400,8 +401,8 @@ inky.Sprite.update = function(d) {
 			inky.velocity = 0;
 		}
 	}
-	for (var i = 0; i < jumppables.length; i++) {
-		if (spriteCollide(jumppables[i].sprite) && !gInput.jump)
+	for (var i = 0; i < jumpables.length; i++) {
+		if (spriteCollide(jumpables[i].sprite) && !gInput.jump)
 			inky.velocity = 0;
 	}
 
@@ -464,7 +465,7 @@ function floor(start, end) {
 	background.addChild(floorSprite);
 
 	collidables.push(this);
-	jumppables.push(this);
+	jumpables.push(this);
 
 }
 
@@ -583,8 +584,8 @@ function platformCollide() {
  * platform
  */
 function jumpCollide() {
-	for (i = 0; i < jumppables.length; i++) {
-		if (spriteCollide(jumppables[i].sprite)) {
+	for (var i = 0; i < jumpables.length; i++) {
+		if (spriteCollide(jumpables[i].sprite)) {
 			console.log("jumppable jump!")
 			return true;
 		}
@@ -592,9 +593,80 @@ function jumpCollide() {
 	return false;
 }
 
+//clears all sprites from the level and frees the arrays that reference them
+function clearLevel() {
+	for (var i = 0; i < collidables.length; i++) {
+		collidables[i].sprite.visible = false;
+		collidables[i].sprite.x = 0;
+		collidables[i].sprite.y = 0;
+		collidables.pop();
+	}
+	for (var i = 0; i < platforms.length; i++) {
+		platfroms.pop();
+	}
+	for (var i = 0; i < jumpables.length; i++) {
+		jumpables.pop();
+	}
+}
+
 new floor(0, 500);
 
-new platform(500, 450, "black");
-new platform(700, 310, "magenta");
-new platform(750, 320, "yellow");
-new platform(860, 200, "black");
+new platform(550, 350, "black");
+new platform(700, 450, "black");
+new platform(800, 350, "black");
+new platform(950, 250, "cyan");
+new platform(1100, 350, "black");
+new platform(1200, 450, "magenta");
+new platform(1300, 250, "yellow");
+new platform(1400, 150, "magenta");
+new platform(1600, 450, "cyan");
+
+new platform(1750, 250, "cyan");
+new platform(1880, 150, "yellow");
+new platform(2100, 450, "magenta");
+new platform(2200, 150, "black");
+new platform(2200, 200, "black");
+new platform(2200, 450, "magenta");
+new platform(2300, 350, "cyan");
+new platform(2420, 350, "yellow");
+new platform(2500, 450, "magenta");
+new platform(2600, 250, "magenta");
+new platform(2700, 400, "yellow");
+new platform(2800, 300, "yellow");
+new platform(2900, 300, "cyan");
+new platform(3000, 200, "cyan");
+new platform(3200, 450, "magenta");
+new platform(3300, 450, "yellow");
+new platform(3400, 200, "magenta");
+new platform(3600, 450, "cyan");
+new platform(3700, 400, "cyan");
+new platform(3800, 400, "magenta");
+new platform(3900, 400, "yellow");
+new platform(4000, 400, "cyan");
+new platform(4100, 400, "yellow");
+new platform(4200, 350, "cyan");
+new platform(4300, 250, "magenta");
+new platform(4500, 450, "yellow");
+new platform(4600, 400, "cyan");
+new platform(4700, 200, "yellow");
+new platform(4800, 100, "cyan");
+new platform(5000, 400, "magenta");
+new platform(5100, 300, "yellow");
+new platform(5200, 100, "cyan");
+new platform(5400, 450, "yellow");
+new platform(5500, 300, "cyan");
+new platform(5600, 450, "magenta");
+new platform(5700, 100, "cyan");
+new platform(5900, 400, "yellow");
+new platform(6000, 220, "magenta");
+new platform(6100, 300, "cyan");
+new platform(6250, 200, "yellow");
+new platform(6380, 100, "magenta");
+new platform(6550, 450, "black");
+new platform(6550, 450, "black");
+new platform(6600, 450, "black");
+new platform(6650, 450, "black");
+new platform(6700, 450, "black");
+new platform(6750, 450, "black");
+new platform(6800, 450, "black");
+new platform(6850, 450, "black");
