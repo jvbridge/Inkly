@@ -15,11 +15,7 @@ gInput.addBool(51, "yellow");
 gInput.addBool(32, "jump");
 gInput.addBool(27, "escape");
 
-/*
- * TODO: reformat this when we get new structure background is the sprite which
- * all things are added to. When the "camera" moves, what's really happening is
- * that the background is moving in the opposite direction
- */
+
 background = new Sprite;
 background.width = 100000; // arbitrarily long number
 background.height = 1000;
@@ -73,6 +69,13 @@ var JUMP_SPEED_DEFAULT = -16
 var runSpeed = 3;
 var RUN_SPEED_DEFAULT = 3;
 
+//used for how long a jump floats in the air 
+//TODO: implement hover
+var hoverTime = 5;
+var HOVER_TIME_DEFAULT = 5;
+
+var currentLevel = "tutorial";
+
 /*******************************************************************************
  * COUNTERS
  ******************************************************************************/
@@ -83,6 +86,7 @@ var counter = 0;
 var deaths = 0;
 
 //used to count how many cycles death should last for
+//TODO: impliment death timer
 var deathTimer = 50;
 var deathTimerTime = 50
 
@@ -210,13 +214,6 @@ mainMenu.init = function() {
 	this.gui.x = canvas.width / 2;
 	this.gui.y = canvas.height / 2;
 
-	/*
-	 * var logo = new Sprite(); logo.x = canvas.width/2; logo.y =
-	 * canvas.height/2; logo.xoffset = -logo.width/2; logo.yoffset =
-	 * -logo.height/2; logo.image = Textures.load("LOGO TEXTURE HERE");
-	 * 
-	 * mainMenu.stage.addChild(logo);
-	 */
 	var newGame = new TextButton("New Game");
 	newGame.y = 067;
 	newGame.center = true;
@@ -335,7 +332,9 @@ settingsMenu.init = function() {
 /* Definition of objects and Sprites */
 /** ************************************************************************ */
 
-// constructor for making inky
+// constructor for making inky 
+//All variables used to describe current state of play here. If a variable 
+//affects how gameplay feels, it belongs in global variables
 function inky() {
 	// PLACEHOLDER current sprite spawning. Not used here in final version
 	inkySprite = new Sprite();
@@ -347,9 +346,11 @@ function inky() {
 	inkySprite.image = Textures.load("Inky.png");
 	this.Sprite = inkySprite;
 
+	//all temp variables here
+	
 	/*
-	 * int that holds inky's velocity. This is updated each update loop and is
-	 * modified by functions
+	 * int that holds inky's vertical velocity. This is updated each update 
+	 * loop and is modified by functions
 	 */
 	this.velocity = 0;
 
@@ -359,25 +360,43 @@ function inky() {
 	 */
 	previousX = inkySprite.x;
 	previousY = inkySprite.y;
-
+	
+	//true if inky is in free fall
+	this.falling = true;
+	
+	//true if inky is at the height of a jump
+	this.hovering = false;
+	
+	//true if inky is touching something that doesn't kill it
+	this.colliding = false;
+	
+	//the platform inky is colliding with
+	this.platform = undefined;
+	
+	//the collidabel inky is colliding with
+	this.collidable = undefined
+	
+	//used to calculate when inky started its last jump
 	this.jumpStart = 0;
+	
+	//true if inky is currently dead;
+	this.dead = false;
 }
 
 // create inky
 inky = new inky();
 
-// update function for inky
+// update function for inky. All inky behavior defined here
 inky.Sprite.update = function(d) {
-
-	/*
-	 * these lines should ALWAYS be first. Also all movement of sprite has
-	 * should be defined here, do NOT move anything from anywhere else.
-	 */
-	inky.previousX = this.x
-	inky.previousY = this.y;
+	
+	if (platformCollide() || jumpCollide()){
+		inky.colliding = true;
+	}else{
+		inky.colliding = false;
+	}
 
 	// This is for falling appropriate code goes here
-	if (inky.velocity < terminalVelocity) {
+	if (inky.velocity < terminalVelocity && !inky.hovering) {
 		inky.velocity += gravity;
 	}
 
@@ -388,8 +407,20 @@ inky.Sprite.update = function(d) {
 			inky.velocity = jumpSpeed;
 			console.log("jump start!");
 		}
-
-		if (platformCollide() || jumpCollide()) {
+		
+		if (platformCollide()) {
+			
+			console.log(inky.platform.y >= inky.previousY);
+			if(inky.platform.y >= inky.previousY){
+				hoverTime = HOVER_TIME_DEFAULT;
+				inky.jumpStart = counter;
+				inky.velocity = jumpSpeed;
+				console.log("boing!");
+			}
+		}
+		
+		if (jumpCollide()) {
+			hoverTime = HOVER_TIME_DEFAULT;
 			inky.jumpStart = counter;
 			inky.velocity = jumpSpeed;
 			console.log("boing!");
@@ -417,9 +448,18 @@ inky.Sprite.update = function(d) {
 		console.log("magenta!");
 	}
 
-	// this loop detects if Inky is touching anything
-	var collide = false;
-
+	//this is seeing if inky really should fall
+	/*
+	if (inky.colliding && !gInput.jump){
+		inky.velocity = 0;
+		if(inky.collidable != undefined){
+			
+		}
+		if (inky.platform != undefined){
+			
+		}
+	}*/
+	
 	for (var i = 0; i < platforms.length; i++) {
 		if (spriteCollide(platforms[i].sprite) && !gInput.jump
 				&& platforms[i].tangible) {
@@ -435,9 +475,19 @@ inky.Sprite.update = function(d) {
 	this.y += inky.velocity;
 
 	background.x -= runSpeed;
+	
+	//Update variables here for next cycle
+	if (inky.previousY < inky.Sprite.y) {
+		falling = true;
+		console.log("falling!");
+	}
+	if (inky.previousY >= inky.Sprite.y ) falling = false;
 
 	if (this.y >= canvas.height)
 		death();
+	
+	inky.previousX = this.x;
+	inky.previousY = this.y;
 
 	tick();
 }
@@ -610,22 +660,18 @@ function spriteCollide(sprite) {
 		topCollide = false;
 
 	if (rightCollide && bottomCollide) {
-		// console.log("right + bottom!");
 		return true;
 	}
 
 	if (leftCollide && bottomCollide) {
-		// console.log("left + bottom!");
 		return true;
 	}
 
 	if (rightCollide && topCollide) {
-		// console.log("right + top!");
 		return true;
 	}
 
 	if (leftCollide && topCollide) {
-		// console.log("left + bottom!");
 		return true;
 	}
 	return false;
@@ -637,22 +683,50 @@ function spriteCollide(sprite) {
 function platformCollide() {
 	for (var i = 0; i < platforms.length; i++) {
 		if (spriteCollide(platforms[i].sprite) && platforms[i].tangible) {
+			inky.colliding = true;
+			inky.platform = platforms[i].sprite;
 			return true;
 		}
-		console.log(spriteCollide(platforms[i].sprite));
+	}
+	inky.colliding = false;
+	inky.platform = undefined;
+	return false;
+}
+
+//returns the sprite of the platform inky is colliding with
+//only use if inky IS collidng with something
+function whichPlatform(){
+	for (var i = 0; i < platforms.length; i++) {
+		if (spriteCollide(platforms[i].sprite) && platforms[i].tangible) {
+			return platforms[i].sprite;
+		}
 	}
 	return false;
 }
 
 /*
  * returns true if inky is colliding with an object it can jump on that is not a
- * platform
+ * platform also sets the reference in inky to the sprite that it's colliding with
  */
 function jumpCollide() {
 	for (var i = 0; i < jumpables.length; i++) {
 		if (spriteCollide(jumpables[i].sprite)) {
-			console.log("jumppable jump!")
+			inky.colliding = true;
+			inky.collidable = jumpables[i].sprite;
 			return true;
+		}
+	}
+	inky.colliding = false;
+	inky.collidable = undefined;
+	return false;
+}
+
+//returns the sprite inky is colliding with.
+function whichCollide(){
+	for (var i = 0; i < jumpables.length; i++) {
+		if (spriteCollide(jumpables[i].sprite)) {
+			inky.colliding = true;
+			return jumpables[i].sprite
 		}
 	}
 	return false;
