@@ -82,6 +82,10 @@ var counter = 0;
 
 var deaths = 0;
 
+//used to count how many cycles death should last for
+var deathTimer = 50;
+var deathTimerTime = 50
+
 /** ************************************************************************ */
 /* MENUS and Manager */
 /** ************************************************************************ */
@@ -207,9 +211,6 @@ mainMenu.init = function() {
 	this.gui.y = canvas.height / 2;
 
 	/*
-	 * TODO: get logo for our game Gavin's job
-	 */
-	/*
 	 * var logo = new Sprite(); logo.x = canvas.width/2; logo.y =
 	 * canvas.height/2; logo.xoffset = -logo.width/2; logo.yoffset =
 	 * -logo.height/2; logo.image = Textures.load("LOGO TEXTURE HERE");
@@ -293,6 +294,23 @@ pauseMenu.init = function() {
 		screenManager.remove(gameScreen);
 	}
 }
+
+// DEATH STATE
+/*
+ * TODO: make deathstate = true var deathState = new Screen(false, false);
+ * 
+ * deathState.image = Textures.load("GameOver.png");
+ * screenManager.push(deathState);
+ * 
+ * deathState.init = function() {
+ * 
+ * var newGame = new TextButton("New Game"); newGame.y = 167; newGame.center =
+ * true; newGame.label.dropShadow = true; newGame.label.fontSize = 30;
+ * newGame.setLabelColors("#aaaaaa", "#ffffff", "#ff0000");
+ * this.gui.addChild(newGame);
+ * 
+ * newGame.func = function() { screenManager.push(gameScreen); } }
+ */
 
 // This makes it so that escape will make the pause screen
 gInput.addFunc(27, function() {
@@ -452,6 +470,43 @@ function platform(x, y, color) {
 	this.sprite = platSprite;
 
 	background.addChild(platSprite);
+
+	platforms.push(this);
+	collidables.push(this);
+
+}
+
+// TODO: read code for vertical
+function platformV(x, y, color) {
+	/*
+	 * generates sprite and returns object sprite has left, right,
+	 */
+	this.tangible = true;
+	this.color = color;
+	this.x = x;
+	this.y = y;
+
+	platVSprite = new Sprite
+	platVSprite.x = x;
+	platVSprite.y = y;
+	platVSprite.height = 480;
+	platVSprite.width = 30;
+
+	// vertical
+	if (color == "cyanV")
+		platVSprite.image = Textures.load("PlatformCV.png");
+	if (color == "magentaV")
+		platVSprite.image = Textures.load("PlatformMV.png");
+	if (color == "yellowV")
+		platVSprite.image = Textures.load("PlatformYV.png");
+	if (color == "blackV")
+		platVSprite.image = Textures.load("PlatformBV.gif");
+	if (color == "dotV")
+		platVSprite.image = Textures.load("PlatformDOTV.png");
+
+	this.sprite = platVSprite;
+
+	background.addChild(platVSprite);
 
 	platforms.push(this);
 	collidables.push(this);
@@ -628,8 +683,797 @@ function death() {
 	deaths += 1;
 }
 
-new floor(0, 500);
 
+/*
+var level1 = {
+	"platforms" : [ {
+		"x" : 0,
+		"y" : 550,
+		"color" : "black"
+	}, {
+		"x" : 550,
+		"y" : 350,
+		"color" : "black"
+	}, {
+		"x" : 700,
+		"y" : 450,
+		"color" : "black"
+	}, {
+		"x" : 800,
+		"y" : 350,
+		"color" : "black"
+	}, {
+		"x" : 950,
+		"y" : 250,
+		"color" : "cyan"
+	}, {
+		"x" : 1100,
+		"y" : 350,
+		"color" : "black"
+	}, {
+		"x" : 1200,
+		"y" : 450,
+		"color" : "magenta"
+	}, {
+		"x" : 1300,
+		"y" : 250,
+		"color" : "yellow"
+	}, {
+		"x" : 1400,
+		"y" : 150,
+		"color" : "magenta"
+	}, {
+		"x" : 1600,
+		"y" : 450,
+		"color" : "cyan"
+	}, {
+		"x" : 1750,
+		"y" : 250,
+		"color" : "cyan"
+	}, {
+		"x" : 1880,
+		"y" : 150,
+		"color" : "yellow"
+	}, {
+		"x" : 2100,
+		"y" : 450,
+		"color" : "magenta"
+	}, {
+		"x" : 2200,
+		"y" : 150,
+		"color" : "black"
+	}, {
+		"x" : 2200,
+		"y" : 200,
+		"color" : "black"
+	}, {
+		"x" : 2200,
+		"y" : 450,
+		"color" : "magenta"
+	}, {
+		"x" : 2300,
+		"y" : 350,
+		"color" : "yellow"
+	}, {
+		"x" : 2420,
+		"y" : 350,
+		"color" : "yellow"
+	}, {
+		"x" : 2500,
+		"y" : 450,
+		"color" : "magenta"
+	}, {
+		"x" : 2600,
+		"y" : 250,
+		"color" : "magenta"
+	}, {
+		"x" : 2700,
+		"y" : 400,
+		"color" : "yellow"
+	}, {
+		"x" : 2800,
+		"y" : 300,
+		"color" : "yellow"
+	}, {
+		"x" : 2900,
+		"y" : 300,
+		"color" : "cyan"
+	}, {
+		"x" : 3000,
+		"y" : 200,
+		"color" : "cyan"
+	}, {
+		"x" : 3200,
+		"y" : 450,
+		"color" : "magenta"
+	}, {
+		"x" : 3300,
+		"y" : 450,
+		"color" : "yellow"
+	}, {
+		"x" : 3400,
+		"y" : 200,
+		"color" : "magenta"
+	}, {
+		"x" : 3600,
+		"y" : 450,
+		"color" : "cyan"
+	}, {
+		"x" : 3700,
+		"y" : 400,
+		"color" : "cyan"
+	}, {
+		"x" : 3800,
+		"y" : 400,
+		"color" : "magenta"
+	}, {
+		"x" : 3900,
+		"y" : 400,
+		"color" : "yellow"
+	}, {
+		"x" : 4000,
+		"y" : 400,
+		"color" : "cyan"
+	}, {
+		"x" : 4100,
+		"y" : 400,
+		"color" : "yellow"
+	}, {
+		"x" : 4200,
+		"y" : 350,
+		"color" : "cyan"
+	}, {
+		"x" : 4300,
+		"y" : 250,
+		"color" : "magenta"
+	}, {
+		"x" : 4500,
+		"y" : 450,
+		"color" : "yellow"
+	}, {
+		"x" : 4600,
+		"y" : 400,
+		"color" : "cyan"
+	}, {
+		"x" : 4700,
+		"y" : 200,
+		"color" : "yellow"
+	}, {
+		"x" : 4800,
+		"y" : 100,
+		"color" : "cyan"
+	}, {
+		"x" : 5000,
+		"y" : 400,
+		"color" : "magenta"
+	}, {
+		"x" : 5100,
+		"y" : 300,
+		"color" : "yellow"
+	}, {
+		"x" : 5200,
+		"y" : 100,
+		"color" : "cyan"
+	}, {
+		"x" : 5400,
+		"y" : 450,
+		"color" : "yellow"
+	}, {
+		"x" : 5500,
+		"y" : 300,
+		"color" : "cyan"
+	}, {
+		"x" : 5600,
+		"y" : 450,
+		"color" : "magenta"
+	}, {
+		"x" : 5700,
+		"y" : 100,
+		"color" : "cyan"
+	}, {
+		"x" : 5900,
+		"y" : 400,
+		"color" : "yellow"
+	}, {
+		"x" : 6000,
+		"y" : 220,
+		"color" : "magenta"
+	}, {
+		"x" : 6100,
+		"y" : 300,
+		"color" : "cyan"
+	}, {
+		"x" : 6250,
+		"y" : 200,
+		"color" : "yellow"
+	}, {
+		"x" : 6380,
+		"y" : 100,
+		"color" : "magenta"
+	}, {
+		"x" : 6550,
+		"y" : 450,
+		"color" : "black"
+	}, {
+		"x" : 6600,
+		"y" : 450,
+		"color" : "black"
+	}, {
+		"x" : 6650,
+		"y" : 450,
+		"color" : "black"
+	}, {
+		"x" : 6700,
+		"y" : 450,
+		"color" : "black"
+	}, {
+		"x" : 6750,
+		"y" : 450,
+		"color" : "black"
+	}, {
+		"x" : 6800,
+		"y" : 450,
+		"color" : "black"
+	}, {
+		"x" : 6850,
+		"y" : 450,
+		"color" : "black"
+	} ]
+}
+
+var level2 = {
+	"platforms" : [ {
+		"x" : 450,
+		"y" : 450,
+		"color" : "black"
+	}, {
+		"x" : 550,
+		"y" : 450,
+		"color" : "black"
+	}, {
+		"x" : 650,
+		"y" : 450,
+		"color" : "black"
+	}, {
+		"x" : 700,
+		"y" : 450,
+		"color" : "black"
+	}, {
+		"x" : 900,
+		"y" : 400,
+		"color" : "black"
+	}, {
+		"x" : 1000,
+		"y" : 450,
+		"color" : "magenta"
+	}, {
+		"x" : 1100,
+		"y" : 350,
+		"color" : "yellow"
+	}, {
+		"x" : 1250,
+		"y" : 350,
+		"color" : "yellow"
+	}, {
+		"x" : 1400,
+		"y" : 450,
+		"color" : "cyan"
+	}, {
+		"x" : 1500,
+		"y" : 250,
+		"color" : "magenta"
+	}, {
+		"x" : 1600,
+		"y" : 250,
+		"color" : "magenta"
+	}, {
+		"x" : 1700,
+		"y" : 250,
+		"color" : "magenta"
+	}, {
+		"x" : 1850,
+		"y" : 250,
+		"color" : "cyan"
+	}, {
+		"x" : 1900,
+		"y" : 350,
+		"color" : "black"
+	}, {
+		"x" : 2050,
+		"y" : 400,
+		"color" : "magenta"
+	}, {
+		"x" : 2150,
+		"y" : 200,
+		"color" : "yellow"
+	}, {
+		"x" : 2200,
+		"y" : 300,
+		"color" : "magenta"
+	}, {
+		"x" : 2300,
+		"y" : 250,
+		"color" : "cyan"
+	}, {
+		"x" : 2550,
+		"y" : 200,
+		"color" : "cyan"
+	}, {
+		"x" : 2700,
+		"y" : 450,
+		"color" : "yellow"
+	}, {
+		"x" : 2800,
+		"y" : 300,
+		"color" : "yellow"
+	}, {
+		"x" : 2950,
+		"y" : 400,
+		"color" : "cyan"
+	}, {
+		"x" : 3050,
+		"y" : 200,
+		"color" : "magenta"
+	}, {
+		"x" : 3200,
+		"y" : 450,
+		"color" : "yellow"
+	}, {
+		"x" : 3300,
+		"y" : 450,
+		"color" : "yellow"
+	}, {
+		"x" : 3300,
+		"y" : 200,
+		"color" : "magenta"
+	}, {
+		"x" : 3400,
+		"y" : 450,
+		"color" : "cyan"
+	}, {
+		"x" : 3400,
+		"y" : 150,
+		"color" : "cyan"
+	}, {
+		"x" : 3500,
+		"y" : 400,
+		"color" : "magenta"
+	}, {
+		"x" : 3500,
+		"y" : 200,
+		"color" : "yellow"
+	}, {
+		"x" : 3700,
+		"y" : 400,
+		"color" : "magenta"
+	}, {
+		"x" : 3800,
+		"y" : 450,
+		"color" : "cyan"
+	}, {
+		"x" : 3850,
+		"y" : 350,
+		"color" : "cyan"
+	}, {
+		"x" : 4000,
+		"y" : 250,
+		"color" : "magenta"
+	}, {
+		"x" : 4170,
+		"y" : 450,
+		"color" : "yellow"
+	}, {
+		"x" : 4300,
+		"y" : 400,
+		"color" : "cyan"
+	}, {
+		"x" : 4400,
+		"y" : 200,
+		"color" : "yellow"
+	}, {
+		"x" : 4550,
+		"y" : 250,
+		"color" : "cyan"
+	}, {
+		"x" : 4650,
+		"y" : 350,
+		"color" : "magenta"
+	}, {
+		"x" : 4800,
+		"y" : 400,
+		"color" : "cyan"
+	}, {
+		"x" : 4900,
+		"y" : 250,
+		"color" : "cyan"
+	}, {
+		"x" : 5050,
+		"y" : 400,
+		"color" : "yellow"
+	}, {
+		"x" : 5200,
+		"y" : 300,
+		"color" : "cyan"
+	}, {
+		"x" : 5350,
+		"y" : 450,
+		"color" : "magenta"
+	}, {
+		"x" : 5500,
+		"y" : 100,
+		"color" : "cyan"
+	}, {
+		"x" : 5650,
+		"y" : 300,
+		"color" : "yellow"
+	}, {
+		"x" : 5750,
+		"y" : 400,
+		"color" : "yellow"
+	}, {
+		"x" : 5850,
+		"y" : 220,
+		"color" : "magenta"
+	}, {
+		"x" : 6000,
+		"y" : 350,
+		"color" : "cyan"
+	}, {
+		"x" : 6150,
+		"y" : 200,
+		"color" : "yellow"
+	}, {
+		"x" : 6250,
+		"y" : 150,
+		"color" : "magenta"
+	}, {
+		"x" : 6350,
+		"y" : 250,
+		"color" : "cyan"
+	}, {
+		"x" : 6450,
+		"y" : 450,
+		"color" : "magenta"
+	}, {
+		"x" : 6550,
+		"y" : 450,
+		"color" : "yellow"
+	}, {
+		"x" : 6650,
+		"y" : 450,
+		"color" : "cyan"
+	}, {
+		"x" : 6700,
+		"y" : 250,
+		"color" : "yellow"
+	}, {
+		"x" : 6850,
+		"y" : 350,
+		"color" : "magenta"
+	}, {
+		"x" : 7050,
+		"y" : 450,
+		"color" : "black"
+	}, {
+		"x" : 7150,
+		"y" : 450,
+		"color" : "black"
+	}, {
+		"x" : 7250,
+		"y" : 450,
+		"color" : "black"
+	}, {
+		"x" : 7350,
+		"y" : 450,
+		"color" : "black"
+	} ]
+}
+
+// "blackV" did not work. Changed to .gif.
+var level2V = {
+	"platformVs" : [
+	// First death wall is for training the player
+	{
+		"x" : 800,
+		"y" : 0,
+		"color" : "magentaV"
+	},
+	// Begin jumps
+	{
+		"x" : 1200,
+		"y" : 0,
+		"color" : "cyanV"
+	}, {
+		"x" : 1700,
+		"y" : 0,
+		"color" : "yellowV"
+	}, {
+		"x" : 2400,
+		"y" : 0,
+		"color" : "magentaV"
+	}, {
+		"x" : 3600,
+		"y" : 200,
+		"color" : "magentaV"
+	}, {
+		"x" : 5150,
+		"y" : 0,
+		"color" : "yellowV"
+	}, {
+		"x" : 5450,
+		"y" : 0,
+		"color" : "cyanV"
+	}, {
+		"x" : 5950,
+		"y" : 0,
+		"color" : "magentaV"
+	}, {
+		"x" : 6600,
+		"y" : 0,
+		"color" : "cyanV"
+	}, {
+		"x" : 6800,
+		"y" : 0,
+		"color" : "magentaV"
+	}, {
+		"x" : 7000,
+		"y" : 0,
+		"color" : "yellowV"
+	},
+	// Rest of platforms placed after level ends.
+	// Loop will stop drawing entirely when either number of platforms or walls
+	// expires.
+	{
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, {
+		"x" : 8000,
+		"y" : 0,
+		"color" : "blackV"
+	}, ]
+}
+
+new floor(0, 500);
+/*
+ * if (level1Flag){ // The '80' is some arbitrary value I picked. Make sure it's
+ * higher than the number of platforms. for (var i = 0; i < 80; i++) { new
+ * platform(level1.platforms[i].x, level1.platforms[i].y,
+ * level1.platforms[i].color); // No level1V exists. Create one if necessary.
+ * new platformV(level1V.platformVs[i].x, level1V.platformVs[i].y,
+ * level1V.platformVs[i].color); } }
+ */
+/*
+// if (level2Flag) {
+for (var i = 0; i < 80; i++) {
+	new platform(level2.platforms[i].x, level2.platforms[i].y,
+			level2.platforms[i].color);
+	new platformV(level2V.platformVs[i].x, level2V.platformVs[i].y,
+			level2V.platformVs[i].color);
+}
+// }
+*/
+new floor(0, 500);
 new platform(550, 350, "black");
 new platform(700, 450, "black");
 new platform(800, 350, "black");
