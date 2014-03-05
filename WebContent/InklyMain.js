@@ -379,6 +379,9 @@ function inky() {
 	//used to calculate when inky started its last jump
 	this.jumpStart = 0;
 	
+	//previous velocity
+	this.previousVelocity = 0;
+	
 	//true if inky is currently dead;
 	this.dead = false;
 }
@@ -388,6 +391,8 @@ inky = new inky();
 
 // update function for inky. All inky behavior defined here
 inky.Sprite.update = function(d) {
+	
+	inky.previousVelocity = inky.velocity; 
 	
 	if (platformCollide() || jumpCollide()){
 		inky.colliding = true;
@@ -399,7 +404,8 @@ inky.Sprite.update = function(d) {
 	if (inky.velocity < terminalVelocity && !inky.hovering) {
 		inky.velocity += gravity;
 	}
-
+	
+	
 	// inky jumping
 	if (gInput.jump) {
 
@@ -408,22 +414,26 @@ inky.Sprite.update = function(d) {
 			console.log("jump start!");
 		}
 		
-		if (platformCollide()) {
-			
-			console.log(inky.platform.y >= inky.previousY);
-			if(inky.platform.y >= inky.previousY){
-				hoverTime = HOVER_TIME_DEFAULT;
-				inky.jumpStart = counter;
-				inky.velocity = jumpSpeed;
-				console.log("boing!");
+		if (inky.colliding) {
+			if (inky.platform != undefined) {
+				if(inky.platform.y >= inky.previousY){
+					hoverTime = HOVER_TIME_DEFAULT;
+					inky.jumpStart = counter;
+					inky.velocity = jumpSpeed;
+					console.log("boing!");
+				}
 			}
 		}
 		
 		if (jumpCollide()) {
-			hoverTime = HOVER_TIME_DEFAULT;
-			inky.jumpStart = counter;
-			inky.velocity = jumpSpeed;
-			console.log("boing!");
+			if (inky.collidable != undefined) {
+				if(inky.collidable.y >= inky.previousY){
+					hoverTime = HOVER_TIME_DEFAULT;
+					inky.jumpStart = counter;
+					inky.velocity = jumpSpeed;
+					console.log("boing!");
+				}
+			}
 		}
 	}
 	if (gInput.cyan) {
@@ -441,7 +451,7 @@ inky.Sprite.update = function(d) {
 		console.log("yellow!");
 	}
 	if (gInput.magenta) {
-		colorMode = "magenta"
+		colorMode = "magenta";
 		updatePlatforms();
 		palette.image = Textures.load("1.png");
 		gameScreen.image = Textures.load("BackgroundM.png");
@@ -449,17 +459,19 @@ inky.Sprite.update = function(d) {
 	}
 
 	//this is seeing if inky really should fall
-	/*
+	
 	if (inky.colliding && !gInput.jump){
 		inky.velocity = 0;
-		if(inky.collidable != undefined){
-			
+		if(inky.collidable != undefined && inky.previousY + inky.Sprite.height
+				<= inky.collidable.y - inky.previousVelocity){
+			inky.Sprite.y = collidable.y - inky.height;
 		}
-		if (inky.platform != undefined){
-			
+		if (inky.platform != undefined && inky.previousY + inky.Sprite.height
+				<= inky.platform.y - inky.previousVelocity){
+			inky.Sprite.y = collidable.y - inky.height;
 		}
-	}*/
-	
+	}
+	/*
 	for (var i = 0; i < platforms.length; i++) {
 		if (spriteCollide(platforms[i].sprite) && !gInput.jump
 				&& platforms[i].tangible) {
@@ -469,7 +481,7 @@ inky.Sprite.update = function(d) {
 	for (var i = 0; i < jumpables.length; i++) {
 		if (spriteCollide(jumpables[i].sprite) && !gInput.jump)
 			inky.velocity = 0;
-	}
+	}*/
 
 	// this changes inky's location finally
 	this.y += inky.velocity;
@@ -479,7 +491,6 @@ inky.Sprite.update = function(d) {
 	//Update variables here for next cycle
 	if (inky.previousY < inky.Sprite.y) {
 		falling = true;
-		console.log("falling!");
 	}
 	if (inky.previousY >= inky.Sprite.y ) falling = false;
 
@@ -688,7 +699,6 @@ function platformCollide() {
 			return true;
 		}
 	}
-	inky.colliding = false;
 	inky.platform = undefined;
 	return false;
 }
@@ -716,7 +726,6 @@ function jumpCollide() {
 			return true;
 		}
 	}
-	inky.colliding = false;
 	inky.collidable = undefined;
 	return false;
 }
