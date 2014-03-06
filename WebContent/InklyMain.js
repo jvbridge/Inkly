@@ -32,8 +32,11 @@ palette.image = Textures.load("0.png");
 /*******************************************************************************
  * ARRAYS
  ******************************************************************************/
-// array to reference all platforms
+// array to reference all horizontal platforms
 var platforms = new Array();
+
+//array to reference all vertical platforms
+var vPlatforms = new Array();
 
 // array to reference all objects that can be collided with
 var collidables = new Array();
@@ -297,6 +300,7 @@ gInput.addFunc(27, function() {
 	if (screenManager.screens.find(gameScreen)
 			&& !screenManager.screens.find(pauseMenu)) {
 		screenManager.push(pauseMenu);
+		
 	}
 })
 
@@ -395,8 +399,6 @@ inky.Sprite.update = function(d) {
 	
 	// inky jumping
 	if (gInput.jump) {
-		
-		
 		//if inky isn't falling, isn't touching anything, and 
 		if (!inky.falling && !inky.colliding && inky.hoverTime < hoverTime){
 			inky.hovering = true;
@@ -445,6 +447,10 @@ inky.Sprite.update = function(d) {
 		}
 		
 	}
+	
+	//turn off hovering in case inky is hovering
+	inky.hovering = false;
+	
 	if (gInput.cyan) {
 		colorMode = "cyan";
 		updatePlatforms();
@@ -573,18 +579,18 @@ function platformV(x, y, color) {
 	platVSprite = new Sprite
 	platVSprite.x = x;
 	platVSprite.y = y;
-	platVSprite.height = 480;
+	platVSprite.height = 100;
 	platVSprite.width = 30;
 
 	// vertical
-	if (color == "cyanV")
-		platVSprite.image = Textures.load("PlatformCV.png");
-	if (color == "magentaV")
-		platVSprite.image = Textures.load("PlatformMV.png");
-	if (color == "yellowV")
-		platVSprite.image = Textures.load("PlatformYV.png");
-	if (color == "blackV")
-		platVSprite.image = Textures.load("PlatformBV.gif");
+	if (color == "cyan")
+		platVSprite.image = Textures.load("DeathWallC.png");
+	if (color == "magenta")
+		platVSprite.image = Textures.load("DeathWallM.png");
+	if (color == "yellow")
+		platVSprite.image = Textures.load("DeathWallY.png");
+	if (color == "black")
+		platVSprite.image = Textures.load("DeathWallB.png");
 	if (color == "dotV")
 		platVSprite.image = Textures.load("PlatformDOTV.png");
 
@@ -592,7 +598,7 @@ function platformV(x, y, color) {
 
 	background.addChild(platVSprite);
 
-	platforms.push(this);
+	vPlatforms.push(this);
 	collidables.push(this);
 
 }
@@ -764,8 +770,15 @@ function whichCollide(){
 	return false;
 }
 
+function vPlatformCollide(){
+	for (var i = 0; i < vPlatforms.length; i++){
+		if (spriteCollide(vPlatforms[i].sprite)){
+			death();
+		}
+	}
+}
+
 // clears all sprites from the level and frees the arrays that reference them
-// TODO: test this function
 function clearLevel() {
 	for (var i = 0; i < collidables.length; i++) {
 		collidables[i].sprite.visible = false;
@@ -774,10 +787,13 @@ function clearLevel() {
 		collidables.pop();
 	}
 	for (var i = 0; i < platforms.length; i++) {
-		platfroms.pop();
+		platforms.pop();
 	}
 	for (var i = 0; i < jumpables.length; i++) {
 		jumpables.pop();
+	}
+	for (var i = 0; i < vPlatforms.length; i++){
+		vPlatforms.pop();
 	}
 }
 
@@ -1579,6 +1595,8 @@ for (var i = 0; i < 80; i++) {
 }
 // }
 */
+
+//new platformV(500, 200, "cyan");
 new floor(0, 500);
 new platform(550, 350, "black");
 new platform(700, 450, "black");
