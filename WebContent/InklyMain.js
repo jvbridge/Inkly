@@ -62,7 +62,7 @@ var colorMode = "none";
 var COLOR_MODE_DEFAULT = "none";
 
 // rate at which velocity changes
-var gravity = 0;
+var gravity = 2;
 var GRAVITY_DEFAULT = 2;
 
 // fastest inky can fall
@@ -78,7 +78,7 @@ var jumpSpeed = -16;
 var JUMP_SPEED_DEFAULT = -16
 
 // how fast the level moves
-var runSpeed = 10;
+var runSpeed = 3;
 var RUN_SPEED_DEFAULT = 3;
 
 // used for how long a jump floats in the air
@@ -823,6 +823,7 @@ function clearLevel() {
 
 // TODO add FX
 function death() {
+
 	inky.dead = true;
 	deathTimerTime++;
 	inky.Sprite.visible = false;
@@ -843,6 +844,7 @@ function finish(){
 	clearLevel();
 	currentLevel = levels.pop();
 	currentLevelNumber++;
+	background.x = 0;
 	buildLevel();
 	death();
 	deaths = 0;
@@ -913,9 +915,9 @@ function platformPrototype(x, y, color){
 
 
 	
-level3 = new level(3,7450);
+level6 = new level(6,7450);
 
-level3.platforms =[new platformPrototype(450,450,"black"),
+level6.platforms =[new platformPrototype(450,450,"black"),
 		 new platformPrototype(
 		 550,
 		 450,
@@ -1157,7 +1159,7 @@ level3.platforms =[new platformPrototype(450,450,"black"),
 		 450,
 		 "black")];
 
-level3.vPlatforms = [new platformPrototype(
+level6.vPlatforms = [new platformPrototype(
 		 1700,
 		 0,
 		 "yellow"),
@@ -1194,10 +1196,159 @@ level3.vPlatforms = [new platformPrototype(
 		 0,
 		 "yellow")];
 
+var level5 = new level(5,7100);
 
-var level2 = new level(2,6850);
+level5.platforms = [
+new platformPrototype(0, 450, "black"),
+new platformPrototype(50, 450, "black"),
+new platformPrototype(100, 450, "black"),
+new platformPrototype(150, 450, "black"),
+new platformPrototype(200, 450, "black"),
+new platformPrototype(250, 450, "black"),
+new platformPrototype(300, 450, "black"),
+new platformPrototype(350, 450, "black"),
+new platformPrototype(400, 450, "black"),
+new platformPrototype(450, 450, "black"),
 
-level2.platforms = [
+new platformPrototype(500, 100, "cyan"),
+new platformPrototype(600, 450, "magenta"),
+new platformPrototype(750, 420, "yellow"),
+new platformPrototype(890, 100, "cyan"),
+new platformPrototype(1000, 200, "magenta"),
+new platformPrototype(1280, 200, "cyan"),
+new platformPrototype(1280, 200, "magenta"),
+new platformPrototype(1400, 330, "yellow"),
+new platformPrototype(1515, 230, "magenta"),
+new platformPrototype(1660, 400, "cyan"),
+new platformPrototype(1800, 200, "yellow"),
+new platformPrototype(1960, 400, "magenta"),
+
+new platformPrototype(2120, 200, "cyan"),
+new platformPrototype(2200, 400, "yellow"),
+new platformPrototype(2320, 100, "cyan"),
+new platformPrototype(2460, 100, "magenta"),
+new platformPrototype(2600, 100, "yellow"),
+new platformPrototype(2770, 100, "magenta"),
+new platformPrototype(2900, 100, "cyan"),
+new platformPrototype(3000, 260, "yellow"),
+new platformPrototype(3200, 110, "cyan"),
+new platformPrototype(3380, 225, "magenta"),
+new platformPrototype(3500, 340, "cyan"),
+new platformPrototype(3600, 200, "yellow"),
+new platformPrototype(3750, 100, "cyan"),
+new platformPrototype(3900, 450, "yellow"),
+new platformPrototype(4000, 420, "cyan"),
+new platformPrototype(4100, 390, "magenta"),
+new platformPrototype(4200, 360, "yellow"),
+new platformPrototype(4200, 330, "cyan"),
+new platformPrototype(4300, 300, "magenta"),
+new platformPrototype(4400, 270, "cyan"),
+new platformPrototype(4500, 240, "yellow"),
+new platformPrototype(4600, 210, "cyan"),
+new platformPrototype(4700, 180, "magenta"),
+new platformPrototype(4800, 150, "cyan"),
+new platformPrototype(4900, 120, "yellow"),
+new platformPrototype(5000, 450, "cyan"),
+new platformPrototype(5100, 0, "magentaV"),
+new platformPrototype(5150, 100, "magenta"),
+new platformPrototype(5280, 300, "yellow"),
+new platformPrototype(5400, 100, "cyan"),
+new platformPrototype(5500, 0, "cyanV"),
+new platformPrototype(5600, 100, "cyan"),
+new platformPrototype(5700, 200, "magenta"),
+new platformPrototype(5850, 300, "yellow"),
+new platformPrototype(6000, 100, "magenta"),
+new platformPrototype(6130, 200, "cyan"),
+new platformPrototype(6200, 340, "yellow"),
+new platformPrototype(6300, 400, "magenta"),
+new platformPrototype(6400, 100, "cyan"),
+
+new platformPrototype(6550, 450, "black"),
+new platformPrototype(6600, 450, "black"),
+new platformPrototype(6650, 450, "black"),
+new platformPrototype(6700, 450, "black"),
+new platformPrototype(6750, 450, "black"),
+new platformPrototype(6800, 450, "black"),
+new platformPrototype(6850, 450, "black"),
+new platformPrototype(6900, 450, "black"),
+new platformPrototype(6950, 450, "black"),
+new platformPrototype(7000, 450, "black"),]
+
+var level4 = new level(4,7100);
+
+level4.platforms = [
+new platformPrototype(0, 450, "black"),
+new platformPrototype(50, 450, "black"),
+new platformPrototype(100, 450, "black"),
+new platformPrototype(150, 450, "black"),
+new platformPrototype(200, 450, "black"),
+new platformPrototype(250, 450, "black"),
+new platformPrototype(300, 450, "black"),
+new platformPrototype(350, 450, "black"),
+new platformPrototype(400, 450, "black"),
+new platformPrototype(450, 450, "black"),
+
+new platformPrototype(550, 350, "cyan"),
+new platformPrototype(700, 450, "magenta"),
+new platformPrototype(800, 350, "yellow"),
+new platformPrototype(950, 250, "black"),
+
+new platformPrototype(1100, 350, "cyan"),
+new platformPrototype(1200, 100, "yellow"),
+new platformPrototype(1300, 200, "magenta"),
+new platformPrototype(1400, 330, "yellow"),
+new platformPrototype(1500, 400, "magenta"),
+new platformPrototype(1700, 100, "cyan"),
+new platformPrototype(1800, 240, "yellow"),
+new platformPrototype(1940, 280, "magenta"),
+new platformPrototype(2010, 100, "cyan"),
+new platformPrototype(2200, 210, "yellow"),
+new platformPrototype(2400, 100, "magenta"),
+new platformPrototype(2500, 250, "yellow"),
+new platformPrototype(2600, 400, "cyan"),
+new platformPrototype(2810, 100, "magenta"),
+new platformPrototype(3000, 200, "yellow"),
+new platformPrototype(3100, 400, "magenta"),
+new platformPrototype(3200, 300, "yellow"),
+new platformPrototype(3400, 100, "magenta"),
+new platformPrototype(3510, 220, "cyan"),
+new platformPrototype(3630, 330, "yellow"),
+new platformPrototype(3700, 300, "cyan"),
+new platformPrototype(3800, 400, "magenta"),
+new platformPrototype(4000, 090, "yellow"),
+new platformPrototype(4100, 180, "cyan"),
+new platformPrototype(4250, 100, "yellow"),
+new platformPrototype(4400, 210, "magenta"),
+new platformPrototype(4500, 290, "yellow"),
+new platformPrototype(4600, 400, "yellow"),
+new platformPrototype(4700, 200, "cyan"),
+new platformPrototype(4800, 120, "magenta"),
+new platformPrototype(5000, 310, "cyan"),
+new platformPrototype(5100, 400, "yellow"),
+new platformPrototype(5300, 50, "magenta"),
+new platformPrototype(5410, 350, "cyan"),
+new platformPrototype(5550, 240, "yellow"),
+new platformPrototype(5700, 100, "cyan"),
+new platformPrototype(5900, 200, "magenta"),
+new platformPrototype(6000, 230, "yellow"),
+new platformPrototype(6200, 300, "yellow"),
+new platformPrototype(6400, 205, "cyan"),
+new platformPrototype(6500, 100, "magenta"),
+new platformPrototype(6550, 450, "black"),
+new platformPrototype(6600, 450, "black"),
+new platformPrototype(6650, 450, "black"),
+new platformPrototype(6700, 450, "black"),
+new platformPrototype(6750, 450, "black"),
+new platformPrototype(6800, 450, "black"),
+new platformPrototype(6850, 450, "black"),
+new platformPrototype(6900, 450, "black"),
+new platformPrototype(6950, 450, "black"),
+new platformPrototype(7000, 450, "black"),]
+
+
+var level3 = new level(3,6950);
+
+level3.platforms = [
 new platformPrototype(
 		 0,
 		 550,
@@ -1430,6 +1581,81 @@ new platformPrototype(
 		 6850,
 		 450,
 		 "black")];
+
+level2 = new level(2,7100);
+
+level2.platforms = [
+new platformPrototype(0, 450, "black"),
+new platformPrototype(50, 450, "black"),
+new platformPrototype(100, 450, "black"),
+new platformPrototype(150, 450, "black"),
+new platformPrototype(200, 450, "black"),
+new platformPrototype(250, 450, "black"),
+new platformPrototype(300, 450, "black"),
+new platformPrototype(350, 450, "black"),
+new platformPrototype(400, 450, "black"),
+new platformPrototype(450, 450, "black"),
+
+new platformPrototype(550, 350, "black"),
+new platformPrototype(700, 450, "black"),
+new platformPrototype(800, 450, "black"),
+new platformPrototype(950, 250, "cyan"),
+new platformPrototype(1100, 350, "black"),
+new platformPrototype(1200, 450, "magenta"),
+new platformPrototype(1300, 250, "yellow"),
+new platformPrototype(1400, 150, "magenta"),
+new platformPrototype(1600, 450, "cyan"),
+
+new platformPrototype(1750, 250, "cyan"),
+new platformPrototype(1880, 150, "yellow"),
+new platformPrototype(2100, 450, "magenta"),
+new platformPrototype(2200, 450, "magenta"),
+new platformPrototype(2300, 350, "cyan"),
+new platformPrototype(2420, 350, "yellow"),
+new platformPrototype(2500, 450, "magenta"),
+new platformPrototype(2600, 250, "magenta"),
+new platformPrototype(2700, 400, "yellow"),
+new platformPrototype(2800, 300, "yellow"),
+new platformPrototype(2900, 300, "cyan"),
+new platformPrototype(3000, 200, "cyan"),
+new platformPrototype(3200, 450, "magenta"),
+new platformPrototype(3300, 450, "yellow"),
+new platformPrototype(3400, 200, "magenta"),
+new platformPrototype(3600, 450, "cyan"),
+new platformPrototype(3700, 400, "cyan"),
+new platformPrototype(3800, 400, "magenta"),
+new platformPrototype(3900, 400, "yellow"),
+new platformPrototype(4000, 400, "cyan"),
+new platformPrototype(4100, 400, "magenta"),
+new platformPrototype(4200, 350, "cyan"),
+new platformPrototype(4300, 250, "magenta"),
+new platformPrototype(4500, 450, "yellow"),
+new platformPrototype(4600, 400, "cyan"),
+new platformPrototype(4700, 200, "yellow"),
+new platformPrototype(4800, 100, "cyan"),
+new platformPrototype(5000, 400, "magenta"),
+new platformPrototype(5100, 300, "yellow"),
+new platformPrototype(5200, 100, "cyan"),
+new platformPrototype(5400, 450, "yellow"),
+new platformPrototype(5500, 300, "cyan"),
+new platformPrototype(5600, 450, "magenta"),
+new platformPrototype(5700, 100, "cyan"),
+new platformPrototype(5900, 400, "yellow"),
+new platformPrototype(6000, 220, "magenta"),
+new platformPrototype(6100, 300, "cyan"),
+new platformPrototype(6250, 200, "yellow"),
+new platformPrototype(6380, 100, "magenta"),
+new platformPrototype(6550, 450, "black"),
+new platformPrototype(6600, 450, "black"),
+new platformPrototype(6650, 450, "black"),
+new platformPrototype(6700, 450, "black"),
+new platformPrototype(6750, 450, "black"),
+new platformPrototype(6800, 450, "black"),
+new platformPrototype(6850, 450, "black"),
+new platformPrototype(6900, 450, "black"),
+new platformPrototype(6950, 450, "black"),
+new platformPrototype(7000, 450, "black")]
+
 
 level1 = new level(1,6950);
 
