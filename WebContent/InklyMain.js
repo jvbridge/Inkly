@@ -71,8 +71,8 @@ var RUN_SPEED_DEFAULT = 3;
 
 //used for how long a jump floats in the air 
 //TODO: implement hover
-var hoverTime = 5;
-var HOVER_TIME_DEFAULT = 5;
+var hoverTime = 20;
+var HOVER_TIME_DEFAULT = 20;
 
 var currentLevel = "tutorial";
 
@@ -292,23 +292,6 @@ pauseMenu.init = function() {
 	}
 }
 
-// DEATH STATE
-/*
- * TODO: make deathstate = true var deathState = new Screen(false, false);
- * 
- * deathState.image = Textures.load("GameOver.png");
- * screenManager.push(deathState);
- * 
- * deathState.init = function() {
- * 
- * var newGame = new TextButton("New Game"); newGame.y = 167; newGame.center =
- * true; newGame.label.dropShadow = true; newGame.label.fontSize = 30;
- * newGame.setLabelColors("#aaaaaa", "#ffffff", "#ff0000");
- * this.gui.addChild(newGame);
- * 
- * newGame.func = function() { screenManager.push(gameScreen); } }
- */
-
 // This makes it so that escape will make the pause screen
 gInput.addFunc(27, function() {
 	if (screenManager.screens.find(gameScreen)
@@ -364,6 +347,9 @@ function inky() {
 	//true if inky is in free fall
 	this.falling = true;
 	
+	//true if inky is jumping upwards
+	this.jumping = false;
+	
 	//true if inky is at the height of a jump
 	this.hovering = false;
 	
@@ -382,6 +368,9 @@ function inky() {
 	//previous velocity
 	this.previousVelocity = 0;
 	
+	//how much time inky has hovered
+	this.hoverTime = 0;
+	
 	//true if inky is currently dead;
 	this.dead = false;
 }
@@ -394,11 +383,9 @@ inky.Sprite.update = function(d) {
 	
 	inky.previousVelocity = inky.velocity; 
 	
-	if (platformCollide() || jumpCollide()){
+	if (platformCollide() || jumpCollide())
 		inky.colliding = true;
-	}else{
-		inky.colliding = false;
-	}
+	else inky.colliding = false;
 
 	// This is for falling appropriate code goes here
 	if (inky.velocity < terminalVelocity && !inky.hovering) {
@@ -408,16 +395,30 @@ inky.Sprite.update = function(d) {
 	
 	// inky jumping
 	if (gInput.jump) {
-
-		if (counter - inky.jumpStart < jumpHeight) {
-			inky.velocity = jumpSpeed;
-			console.log("jump start!");
+		
+		
+		//if inky isn't falling, isn't touching anything, and 
+		if (!inky.falling && !inky.colliding && inky.hoverTime < hoverTime){
+			inky.hovering = true;
+			console.log("hovering!")
+		}
+		
+		if (inky.hovering){
+			inky.velocity = 0;
+			inky.hoverTime++;
+			
+			if (inky.hoverTime >= hoverTime){
+				inky.hovering = false;
+				inky.falling = true;
+				inky.velocity += gravity;
+				//console.log("done hovering!");
+			}
 		}
 		
 		if (inky.colliding) {
 			if (inky.platform != undefined) {
 				if(inky.platform.y >= inky.previousY){
-					hoverTime = HOVER_TIME_DEFAULT;
+					inky.hoverTime = 0;
 					inky.jumpStart = counter;
 					inky.velocity = jumpSpeed;
 					console.log("boing!");
@@ -428,13 +429,21 @@ inky.Sprite.update = function(d) {
 		if (jumpCollide()) {
 			if (inky.collidable != undefined) {
 				if(inky.collidable.y >= inky.previousY){
-					hoverTime = HOVER_TIME_DEFAULT;
+					inky.hoverTime = 0;
 					inky.jumpStart = counter;
 					inky.velocity = jumpSpeed;
 					console.log("boing!");
 				}
 			}
 		}
+		
+		//if inky's has time left to jump then we should set the velocity to jump speed to go up
+		if (counter - inky.jumpStart < jumpHeight) {
+			inky.velocity = jumpSpeed;
+			inky.hoverTime = 0;
+			inky.jumping = true;
+		}
+		
 	}
 	if (gInput.cyan) {
 		colorMode = "cyan";
@@ -462,13 +471,26 @@ inky.Sprite.update = function(d) {
 	
 	if (inky.colliding && !gInput.jump){
 		inky.velocity = 0;
+		
+		if(inky.collidable != undefined){
+			console.log ("Inky prev: " + (inky.previousY + inky.Sprite.height)); 
+			console.log ("Inky curr: " + (inky.Sprite.y + inky.Sprite.height));
+			console.log ("collidable y: " + (inky.collidable.y - inky.previousVelocity));
+		}
+		
 		if(inky.collidable != undefined && inky.previousY + inky.Sprite.height
 				<= inky.collidable.y - inky.previousVelocity){
-			inky.Sprite.y = collidable.y - inky.height;
+			inky.Sprite.y = inky.collidable.y - inky.height;
+		}
+		
+		if (inky.platform != undefined){
+			console.log("inky prev: " + (inky.previousY + inky.Sprite.height));
+			console.log ("Inky curr: " + (inky.Sprite.y + inky.Sprite.height));
+			console.log("platform y: " + (inky.platform.y - inky.previousVelocity));
 		}
 		if (inky.platform != undefined && inky.previousY + inky.Sprite.height
 				<= inky.platform.y - inky.previousVelocity){
-			inky.Sprite.y = collidable.y - inky.height;
+			inky.Sprite.y = inky.platform.y - inky.height;
 		}
 	}
 	/*
@@ -490,16 +512,17 @@ inky.Sprite.update = function(d) {
 	
 	//Update variables here for next cycle
 	if (inky.previousY < inky.Sprite.y) {
-		falling = true;
-	}
-	if (inky.previousY >= inky.Sprite.y ) falling = false;
+		inky.falling = true;
+		inky.jumping = false;
+	}else inky.falling = false;
 
 	if (this.y >= canvas.height)
 		death();
-	
-	inky.previousX = this.x;
-	inky.previousY = this.y;
 
+	
+	inky.previousX = inky.Sprite.x;
+	inky.previousY = inky.Sprite.y;
+	
 	tick();
 }
 
