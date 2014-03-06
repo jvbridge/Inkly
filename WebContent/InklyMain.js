@@ -35,7 +35,7 @@ palette.image = Textures.load("0.png");
 // array to reference all horizontal platforms
 var platforms = new Array();
 
-//array to reference all vertical platforms
+// array to reference all vertical platforms
 var vPlatforms = new Array();
 
 // array to reference all objects that can be collided with
@@ -44,21 +44,30 @@ var collidables = new Array();
 // array to reference all things that inky can jump on
 var jumpables = new Array();
 
+// an array of all level objects
+var levels = new Array();
+
 /** ************************************************************************* */
 /* GLOBAL VARIABLES */
 /** ************************************************************************* */
+
+//reference to game's current level
+var currentlevel = undefined;
+
+//Which level you're currently on
+var currentLevelNumber = 1; 
 
 // variable for the color mode
 var colorMode = "none";
 var COLOR_MODE_DEFAULT = "none";
 
 // rate at which velocity changes
-var gravity = 2;
+var gravity = 0;
 var GRAVITY_DEFAULT = 2;
 
 // fastest inky can fall
-var terminalVelocity = 8;
-var TERMINAL_VELOCITY_DEFAULT = 8
+var terminalVelocity = 6;
+var TERMINAL_VELOCITY_DEFAULT = 6
 
 // variable for calculating Inky's jump height
 var jumpHeight = 15;
@@ -69,15 +78,12 @@ var jumpSpeed = -16;
 var JUMP_SPEED_DEFAULT = -16
 
 // how fast the level moves
-var runSpeed = 3;
+var runSpeed = 10;
 var RUN_SPEED_DEFAULT = 3;
 
-//used for how long a jump floats in the air 
-//TODO: implement hover
+// used for how long a jump floats in the air
 var hoverTime = 20;
 var HOVER_TIME_DEFAULT = 20;
-
-var currentLevel = "tutorial";
 
 /*******************************************************************************
  * COUNTERS
@@ -88,10 +94,9 @@ var counter = 0;
 
 var deaths = 0;
 
-//used to count how many cycles death should last for
-//TODO: impliment death timer
-var deathTimer = 50;
-var deathTimerTime = 50
+// used to count how many cycles death should last for
+var deathTimer = 100;
+var deathTimerTime = 0;
 
 /** ************************************************************************ */
 /* MENUS and Manager */
@@ -227,6 +232,9 @@ mainMenu.init = function() {
 
 	newGame.func = function() {
 		screenManager.push(gameScreen);
+		currentLevelNumber = 1;
+		currentLevel = levels.pop();
+		buildLevel();
 	}
 
 	var resumeGame = new TextButton("Resume Game");
@@ -319,9 +327,9 @@ settingsMenu.init = function() {
 /* Definition of objects and Sprites */
 /** ************************************************************************ */
 
-// constructor for making inky 
-//All variables used to describe current state of play here. If a variable 
-//affects how gameplay feels, it belongs in global variables
+// constructor for making inky
+// All variables used to describe current state of play here. If a variable
+// affects how gameplay feels, it belongs in global variables
 function inky() {
 	// PLACEHOLDER current sprite spawning. Not used here in final version
 	inkySprite = new Sprite();
@@ -333,11 +341,11 @@ function inky() {
 	inkySprite.image = Textures.load("Inky.png");
 	this.Sprite = inkySprite;
 
-	//all temp variables here
+	// all temp variables here
 	
 	/*
-	 * int that holds inky's vertical velocity. This is updated each update 
-	 * loop and is modified by functions
+	 * int that holds inky's vertical velocity. This is updated each update loop
+	 * and is modified by functions
 	 */
 	this.velocity = 0;
 
@@ -348,34 +356,34 @@ function inky() {
 	previousX = inkySprite.x;
 	previousY = inkySprite.y;
 	
-	//true if inky is in free fall
+	// true if inky is in free fall
 	this.falling = true;
 	
-	//true if inky is jumping upwards
+	// true if inky is jumping upwards
 	this.jumping = false;
 	
-	//true if inky is at the height of a jump
+	// true if inky is at the height of a jump
 	this.hovering = false;
 	
-	//true if inky is touching something that doesn't kill it
+	// true if inky is touching something that doesn't kill it
 	this.colliding = false;
 	
-	//the platform inky is colliding with
+	// the platform inky is colliding with
 	this.platform = undefined;
 	
-	//the collidable inky is colliding with
+	// the collidable inky is colliding with
 	this.collidable = undefined
 	
-	//used to calculate when inky started its last jump
+	// used to calculate when inky started its last jump
 	this.jumpStart = 0;
 	
-	//previous velocity
+	// previous velocity
 	this.previousVelocity = 0;
 	
-	//how much time inky has hovered
+	// how much time inky has hovered
 	this.hoverTime = 0;
 	
-	//true if inky is currently dead;
+	// true if inky is currently dead;
 	this.dead = false;
 }
 
@@ -438,7 +446,8 @@ inky.Sprite.update = function(d) {
 			}
 		}
 		
-		//if inky's has time left to jump then we should set the velocity to jump speed to go up
+		// if inky's has time left to jump then we should set the velocity to
+		// jump speed to go up
 		if (counter - inky.jumpStart < jumpHeight) {
 			inky.velocity = jumpSpeed;
 			inky.hoverTime = 0;
@@ -447,7 +456,7 @@ inky.Sprite.update = function(d) {
 		
 	}
 	
-	//turn off hovering in case inky is hovering
+	// turn off hovering in case inky is hovering
 	inky.hovering = false;
 	
 	if (gInput.cyan) {
@@ -472,15 +481,13 @@ inky.Sprite.update = function(d) {
 		console.log("magenta!");
 	}
 
-	//this is seeing if inky really should fall
+	// this is seeing if inky really should fall
 	
 	if (inky.colliding && !gInput.jump){
 		inky.velocity = 0;
 		
 		if(inky.collidable != undefined){
-			console.log ("Inky prev: " + (inky.previousY + inky.Sprite.height)); 
-			console.log ("Inky curr: " + (inky.Sprite.y + inky.Sprite.height));
-			console.log ("collidable y: " + (inky.collidable.y - inky.previousVelocity));
+			//TODO: replace console logs here
 		}
 		
 		if(inky.collidable != undefined && inky.previousY + inky.Sprite.height
@@ -489,33 +496,22 @@ inky.Sprite.update = function(d) {
 		}
 		
 		if (inky.platform != undefined){
-			console.log("inky prev: " + (inky.previousY + inky.Sprite.height));
+			/*console.log("inky prev: " + (inky.previousY + inky.Sprite.height));
 			console.log ("Inky curr: " + (inky.Sprite.y + inky.Sprite.height));
-			console.log("platform y: " + (inky.platform.y - inky.previousVelocity));
+			console.log("platform y: " + (inky.platform.y - inky.previousVelocity));*/
 		}
 		if (inky.platform != undefined && inky.previousY + inky.Sprite.height
 				<= inky.platform.y - inky.previousVelocity){
 			inky.Sprite.y = inky.platform.y - inky.height;
 		}
 	}
-	/*
-	for (var i = 0; i < platforms.length; i++) {
-		if (spriteCollide(platforms[i].sprite) && !gInput.jump
-				&& platforms[i].tangible) {
-			inky.velocity = 0;
-		}
-	}
-	for (var i = 0; i < jumpables.length; i++) {
-		if (spriteCollide(jumpables[i].sprite) && !gInput.jump)
-			inky.velocity = 0;
-	}*/
 
 	// this changes inky's location finally
 	this.y += inky.velocity;
 	if (!inky.dead)
 		background.x -= runSpeed;
 	
-	//Update variables here for next cycle
+	// Update variables here for next cycle
 	if (inky.previousY < inky.Sprite.y) {
 		inky.falling = true;
 		inky.jumping = false;
@@ -531,6 +527,11 @@ inky.Sprite.update = function(d) {
 	
 	if (inky.dead)
 		death();
+	
+	if(spriteCollide(currentLevel.finish)){
+		finish();
+		console.log("FINISH!")
+	}
 	
 	tick();
 }
@@ -742,8 +743,8 @@ function platformCollide() {
 	return false;
 }
 
-//returns the sprite of the platform inky is colliding with
-//only use if inky IS collidng with something
+// returns the sprite of the platform inky is colliding with
+// only use if inky IS collidng with something
 function whichPlatform(){
 	for (var i = 0; i < platforms.length; i++) {
 		if (spriteCollide(platforms[i].sprite) && platforms[i].tangible) {
@@ -755,7 +756,8 @@ function whichPlatform(){
 
 /*
  * returns true if inky is colliding with an object it can jump on that is not a
- * platform also sets the reference in inky to the sprite that it's colliding with
+ * platform also sets the reference in inky to the sprite that it's colliding
+ * with
  */
 function jumpCollide() {
 	for (var i = 0; i < jumpables.length; i++) {
@@ -769,7 +771,7 @@ function jumpCollide() {
 	return false;
 }
 
-//returns the sprite inky is colliding with.
+// returns the sprite inky is colliding with.
 function whichCollide(){
 	for (var i = 0; i < jumpables.length; i++) {
 		if (spriteCollide(jumpables[i].sprite)) {
@@ -797,879 +799,699 @@ function clearLevel() {
 		collidables.pop();
 	}
 	for (var i = 0; i < platforms.length; i++) {
+		platforms[i].tangible = false;
+		platforms[i].sprite.x = 0;
+		platforms[i].sprite.y = 0;
 		platforms.pop();
 	}
 	for (var i = 0; i < jumpables.length; i++) {
+		jumpables[i].sprite.x = 0;
+		jumpables[i].sprite.y = 0;
+		jumpables[i].sprite.visible = false;
 		jumpables.pop();
 	}
 	for (var i = 0; i < vPlatforms.length; i++){
+		vPlatforms[i].tangible = false;
+		vPlatforms[i].sprite.x = 0;
+		vPlatforms[i].sprite.y = 0;
 		vPlatforms.pop();
 	}
+	currentLevel.finish.visible = false;
+	currentLevel.finish.x = -500;
+	currentLevel.finish.y  = 1000;
 }
 
-// TODO complete function
+// TODO add FX
 function death() {
 	inky.dead = true;
 	deathTimerTime++;
+	inky.Sprite.visible = false;
 	
 	if (deathTimerTime >= deathTimer){
 		inky.Sprite.y = canvas.height - 200;
 		inky.velocity = 0;
 		background.x = 0;
 		deaths += 1;
+		deathTimerTime = 0;
+		inky.Sprite.visible = true;
 		inky.dead = false;
 	}
 }
 
+//TODO finish screen goes here
+function finish(){
+	clearLevel();
+	currentLevel = levels.pop();
+	currentLevelNumber++;
+	buildLevel();
+	death();
+	deaths = 0;
+}
+
 
 /*
-var level1 = {
-	"platforms" : [ {
-		"x" : 0,
-		"y" : 550,
-		"color" : "black"
-	}, {
-		"x" : 550,
-		"y" : 350,
-		"color" : "black"
-	}, {
-		"x" : 700,
-		"y" : 450,
-		"color" : "black"
-	}, {
-		"x" : 800,
-		"y" : 350,
-		"color" : "black"
-	}, {
-		"x" : 950,
-		"y" : 250,
-		"color" : "cyan"
-	}, {
-		"x" : 1100,
-		"y" : 350,
-		"color" : "black"
-	}, {
-		"x" : 1200,
-		"y" : 450,
-		"color" : "magenta"
-	}, {
-		"x" : 1300,
-		"y" : 250,
-		"color" : "yellow"
-	}, {
-		"x" : 1400,
-		"y" : 150,
-		"color" : "magenta"
-	}, {
-		"x" : 1600,
-		"y" : 450,
-		"color" : "cyan"
-	}, {
-		"x" : 1750,
-		"y" : 250,
-		"color" : "cyan"
-	}, {
-		"x" : 1880,
-		"y" : 150,
-		"color" : "yellow"
-	}, {
-		"x" : 2100,
-		"y" : 450,
-		"color" : "magenta"
-	}, {
-		"x" : 2200,
-		"y" : 150,
-		"color" : "black"
-	}, {
-		"x" : 2200,
-		"y" : 200,
-		"color" : "black"
-	}, {
-		"x" : 2200,
-		"y" : 450,
-		"color" : "magenta"
-	}, {
-		"x" : 2300,
-		"y" : 350,
-		"color" : "yellow"
-	}, {
-		"x" : 2420,
-		"y" : 350,
-		"color" : "yellow"
-	}, {
-		"x" : 2500,
-		"y" : 450,
-		"color" : "magenta"
-	}, {
-		"x" : 2600,
-		"y" : 250,
-		"color" : "magenta"
-	}, {
-		"x" : 2700,
-		"y" : 400,
-		"color" : "yellow"
-	}, {
-		"x" : 2800,
-		"y" : 300,
-		"color" : "yellow"
-	}, {
-		"x" : 2900,
-		"y" : 300,
-		"color" : "cyan"
-	}, {
-		"x" : 3000,
-		"y" : 200,
-		"color" : "cyan"
-	}, {
-		"x" : 3200,
-		"y" : 450,
-		"color" : "magenta"
-	}, {
-		"x" : 3300,
-		"y" : 450,
-		"color" : "yellow"
-	}, {
-		"x" : 3400,
-		"y" : 200,
-		"color" : "magenta"
-	}, {
-		"x" : 3600,
-		"y" : 450,
-		"color" : "cyan"
-	}, {
-		"x" : 3700,
-		"y" : 400,
-		"color" : "cyan"
-	}, {
-		"x" : 3800,
-		"y" : 400,
-		"color" : "magenta"
-	}, {
-		"x" : 3900,
-		"y" : 400,
-		"color" : "yellow"
-	}, {
-		"x" : 4000,
-		"y" : 400,
-		"color" : "cyan"
-	}, {
-		"x" : 4100,
-		"y" : 400,
-		"color" : "yellow"
-	}, {
-		"x" : 4200,
-		"y" : 350,
-		"color" : "cyan"
-	}, {
-		"x" : 4300,
-		"y" : 250,
-		"color" : "magenta"
-	}, {
-		"x" : 4500,
-		"y" : 450,
-		"color" : "yellow"
-	}, {
-		"x" : 4600,
-		"y" : 400,
-		"color" : "cyan"
-	}, {
-		"x" : 4700,
-		"y" : 200,
-		"color" : "yellow"
-	}, {
-		"x" : 4800,
-		"y" : 100,
-		"color" : "cyan"
-	}, {
-		"x" : 5000,
-		"y" : 400,
-		"color" : "magenta"
-	}, {
-		"x" : 5100,
-		"y" : 300,
-		"color" : "yellow"
-	}, {
-		"x" : 5200,
-		"y" : 100,
-		"color" : "cyan"
-	}, {
-		"x" : 5400,
-		"y" : 450,
-		"color" : "yellow"
-	}, {
-		"x" : 5500,
-		"y" : 300,
-		"color" : "cyan"
-	}, {
-		"x" : 5600,
-		"y" : 450,
-		"color" : "magenta"
-	}, {
-		"x" : 5700,
-		"y" : 100,
-		"color" : "cyan"
-	}, {
-		"x" : 5900,
-		"y" : 400,
-		"color" : "yellow"
-	}, {
-		"x" : 6000,
-		"y" : 220,
-		"color" : "magenta"
-	}, {
-		"x" : 6100,
-		"y" : 300,
-		"color" : "cyan"
-	}, {
-		"x" : 6250,
-		"y" : 200,
-		"color" : "yellow"
-	}, {
-		"x" : 6380,
-		"y" : 100,
-		"color" : "magenta"
-	}, {
-		"x" : 6550,
-		"y" : 450,
-		"color" : "black"
-	}, {
-		"x" : 6600,
-		"y" : 450,
-		"color" : "black"
-	}, {
-		"x" : 6650,
-		"y" : 450,
-		"color" : "black"
-	}, {
-		"x" : 6700,
-		"y" : 450,
-		"color" : "black"
-	}, {
-		"x" : 6750,
-		"y" : 450,
-		"color" : "black"
-	}, {
-		"x" : 6800,
-		"y" : 450,
-		"color" : "black"
-	}, {
-		"x" : 6850,
-		"y" : 450,
-		"color" : "black"
-	} ]
-}
-
-var level2 = {
-	"platforms" : [ {
-		"x" : 450,
-		"y" : 450,
-		"color" : "black"
-	}, {
-		"x" : 550,
-		"y" : 450,
-		"color" : "black"
-	}, {
-		"x" : 650,
-		"y" : 450,
-		"color" : "black"
-	}, {
-		"x" : 700,
-		"y" : 450,
-		"color" : "black"
-	}, {
-		"x" : 900,
-		"y" : 400,
-		"color" : "black"
-	}, {
-		"x" : 1000,
-		"y" : 450,
-		"color" : "magenta"
-	}, {
-		"x" : 1100,
-		"y" : 350,
-		"color" : "yellow"
-	}, {
-		"x" : 1250,
-		"y" : 350,
-		"color" : "yellow"
-	}, {
-		"x" : 1400,
-		"y" : 450,
-		"color" : "cyan"
-	}, {
-		"x" : 1500,
-		"y" : 250,
-		"color" : "magenta"
-	}, {
-		"x" : 1600,
-		"y" : 250,
-		"color" : "magenta"
-	}, {
-		"x" : 1700,
-		"y" : 250,
-		"color" : "magenta"
-	}, {
-		"x" : 1850,
-		"y" : 250,
-		"color" : "cyan"
-	}, {
-		"x" : 1900,
-		"y" : 350,
-		"color" : "black"
-	}, {
-		"x" : 2050,
-		"y" : 400,
-		"color" : "magenta"
-	}, {
-		"x" : 2150,
-		"y" : 200,
-		"color" : "yellow"
-	}, {
-		"x" : 2200,
-		"y" : 300,
-		"color" : "magenta"
-	}, {
-		"x" : 2300,
-		"y" : 250,
-		"color" : "cyan"
-	}, {
-		"x" : 2550,
-		"y" : 200,
-		"color" : "cyan"
-	}, {
-		"x" : 2700,
-		"y" : 450,
-		"color" : "yellow"
-	}, {
-		"x" : 2800,
-		"y" : 300,
-		"color" : "yellow"
-	}, {
-		"x" : 2950,
-		"y" : 400,
-		"color" : "cyan"
-	}, {
-		"x" : 3050,
-		"y" : 200,
-		"color" : "magenta"
-	}, {
-		"x" : 3200,
-		"y" : 450,
-		"color" : "yellow"
-	}, {
-		"x" : 3300,
-		"y" : 450,
-		"color" : "yellow"
-	}, {
-		"x" : 3300,
-		"y" : 200,
-		"color" : "magenta"
-	}, {
-		"x" : 3400,
-		"y" : 450,
-		"color" : "cyan"
-	}, {
-		"x" : 3400,
-		"y" : 150,
-		"color" : "cyan"
-	}, {
-		"x" : 3500,
-		"y" : 400,
-		"color" : "magenta"
-	}, {
-		"x" : 3500,
-		"y" : 200,
-		"color" : "yellow"
-	}, {
-		"x" : 3700,
-		"y" : 400,
-		"color" : "magenta"
-	}, {
-		"x" : 3800,
-		"y" : 450,
-		"color" : "cyan"
-	}, {
-		"x" : 3850,
-		"y" : 350,
-		"color" : "cyan"
-	}, {
-		"x" : 4000,
-		"y" : 250,
-		"color" : "magenta"
-	}, {
-		"x" : 4170,
-		"y" : 450,
-		"color" : "yellow"
-	}, {
-		"x" : 4300,
-		"y" : 400,
-		"color" : "cyan"
-	}, {
-		"x" : 4400,
-		"y" : 200,
-		"color" : "yellow"
-	}, {
-		"x" : 4550,
-		"y" : 250,
-		"color" : "cyan"
-	}, {
-		"x" : 4650,
-		"y" : 350,
-		"color" : "magenta"
-	}, {
-		"x" : 4800,
-		"y" : 400,
-		"color" : "cyan"
-	}, {
-		"x" : 4900,
-		"y" : 250,
-		"color" : "cyan"
-	}, {
-		"x" : 5050,
-		"y" : 400,
-		"color" : "yellow"
-	}, {
-		"x" : 5200,
-		"y" : 300,
-		"color" : "cyan"
-	}, {
-		"x" : 5350,
-		"y" : 450,
-		"color" : "magenta"
-	}, {
-		"x" : 5500,
-		"y" : 100,
-		"color" : "cyan"
-	}, {
-		"x" : 5650,
-		"y" : 300,
-		"color" : "yellow"
-	}, {
-		"x" : 5750,
-		"y" : 400,
-		"color" : "yellow"
-	}, {
-		"x" : 5850,
-		"y" : 220,
-		"color" : "magenta"
-	}, {
-		"x" : 6000,
-		"y" : 350,
-		"color" : "cyan"
-	}, {
-		"x" : 6150,
-		"y" : 200,
-		"color" : "yellow"
-	}, {
-		"x" : 6250,
-		"y" : 150,
-		"color" : "magenta"
-	}, {
-		"x" : 6350,
-		"y" : 250,
-		"color" : "cyan"
-	}, {
-		"x" : 6450,
-		"y" : 450,
-		"color" : "magenta"
-	}, {
-		"x" : 6550,
-		"y" : 450,
-		"color" : "yellow"
-	}, {
-		"x" : 6650,
-		"y" : 450,
-		"color" : "cyan"
-	}, {
-		"x" : 6700,
-		"y" : 250,
-		"color" : "yellow"
-	}, {
-		"x" : 6850,
-		"y" : 350,
-		"color" : "magenta"
-	}, {
-		"x" : 7050,
-		"y" : 450,
-		"color" : "black"
-	}, {
-		"x" : 7150,
-		"y" : 450,
-		"color" : "black"
-	}, {
-		"x" : 7250,
-		"y" : 450,
-		"color" : "black"
-	}, {
-		"x" : 7350,
-		"y" : 450,
-		"color" : "black"
-	} ]
-}
-
-// "black" did not work. Changed to .gif.
-var level2V = {
-	"platformVs" : [
-	// First death wall is for training the player
-	{
-		"x" : 800,
-		"y" : 0,
-		"color" : "magenta"
-	},
-	// Begin jumps
-	{
-		"x" : 1200,
-		"y" : 0,
-		"color" : "cyan"
-	}, {
-		"x" : 1700,
-		"y" : 0,
-		"color" : "yellow"
-	}, {
-		"x" : 2400,
-		"y" : 0,
-		"color" : "magenta"
-	}, {
-		"x" : 3600,
-		"y" : 200,
-		"color" : "magenta"
-	}, {
-		"x" : 5150,
-		"y" : 0,
-		"color" : "yellow"
-	}, {
-		"x" : 5450,
-		"y" : 0,
-		"color" : "cyan"
-	}, {
-		"x" : 5950,
-		"y" : 0,
-		"color" : "magenta"
-	}, {
-		"x" : 6600,
-		"y" : 0,
-		"color" : "cyan"
-	}, {
-		"x" : 6800,
-		"y" : 0,
-		"color" : "magenta"
-	}, {
-		"x" : 7000,
-		"y" : 0,
-		"color" : "yellow"
-	},
-	// Rest of platforms placed after level ends.
-	// Loop will stop drawing entirely when either number of platforms or walls
-	// expires.
-	{
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, {
-		"x" : 8000,
-		"y" : 0,
-		"color" : "black"
-	}, ]
-}
-
-new floor(0, 500);
-/*
- * if (level1Flag){ // The '80' is some arbitrary value I picked. Make sure it's
- * higher than the number of platforms. for (var i = 0; i < 80; i++) { new
- * platform(level1.platforms[i].x, level1.platforms[i].y,
- * level1.platforms[i].color); // No level1V exists. Create one if necessary.
- * new platformV(level1V.platformVs[i].x, level1V.platformVs[i].y,
- * level1V.platformVs[i].color); } }
+ * LEVEL HANDLING
  */
-/*
-// if (level2Flag) {
-for (var i = 0; i < 80; i++) {
-	new platform(level2.platforms[i].x, level2.platforms[i].y,
-			level2.platforms[i].color);
-	new platformV(level2V.platformVs[i].x, level2V.platformVs[i].y,
-			level2V.platformVs[i].color);
+
+function level(levelNumber, levelLength){
+	this.levelNumber = levelNumber;
+	this.levelLength = levelLength;
+	this.platforms = new Array;
+	this.vPlatforms = new Array;
+	this.floors = new Array;
+	this.currentLevel = false;
+	finishLine = new Sprite;
+	finishLine.x = levelLength;
+	finishLine.y = 0;
+	finishLine.height = canvas.height;
+	finishLine.width = 100;
+	finishLine.image = Textures.load("FinishLine.png");
+	finishLine.visible = true;
+	this.finish = finishLine;
+	
+	levels.push(this);
 }
-// }
-*/
 
-new platformV(500, 200, "cyan");
-new floor(0, 500);
-new platform(550, 350, "black");
-new platform(700, 450, "black");
-new platform(800, 350, "black");
-new platform(950, 250, "cyan");
-new platform(1100, 350, "black");
-new platform(1200, 450, "magenta");
-new platform(1300, 250, "yellow");
-new platform(1400, 150, "magenta");
-new platform(1600, 450, "cyan");
+function buildLevel(){
+	
+	console.log("building level!");
+	console.log("levelLength: " + currentLevel.levelLength);
+	console.log(currentLevel);
+	
+	console.log(currentLevel.platforms.length);
+	for (i = 0; i < currentLevel.platforms.length; i++){
+		new platform(currentLevel.platforms[i].x, currentLevel.platforms[i].y, 
+				currentLevel.platforms[i].color);
+	}
+	for (i = 0; i < currentLevel.vPlatforms.length;i++){
+		new platformV(currentLevel.vPlatforms[i].x, currentLevel.vPlatforms[i].y, 
+				currentLevel.vPlatforms[i].color);
+	}
+	for (i = 0; i < currentLevel.floors.length;i++){
+		new floor(currentLevel.floors[i].start, currentLevel.floors[i].end);
+	}
+	for(var i = 0; i < canvas.height; i += 100){
+		new platformV(550, i, "cyan");
+	}
+	new floor(0,500);
+	background.addChild(currentLevel.finish);
+}
 
-new platform(1750, 250, "cyan");
-new platform(1880, 150, "yellow");
-new platform(2100, 450, "magenta");
-new platform(2200, 150, "black");
-new platform(2200, 200, "black");
-new platform(2200, 450, "magenta");
-new platform(2300, 350, "cyan");
-new platform(2420, 350, "yellow");
-new platform(2500, 450, "magenta");
-new platform(2600, 250, "magenta");
-new platform(2700, 400, "yellow");
-new platform(2800, 300, "yellow");
-new platform(2900, 300, "cyan");
-new platform(3000, 200, "cyan");
-new platform(3200, 450, "magenta");
-new platform(3300, 450, "yellow");
-new platform(3400, 200, "magenta");
-new platform(3600, 450, "cyan");
-new platform(3700, 400, "cyan");
-new platform(3800, 400, "magenta");
-new platform(3900, 400, "yellow");
-new platform(4000, 400, "cyan");
-new platform(4100, 400, "yellow");
-new platform(4200, 350, "cyan");
-new platform(4300, 250, "magenta");
-new platform(4500, 450, "yellow");
-new platform(4600, 400, "cyan");
-new platform(4700, 200, "yellow");
-new platform(4800, 100, "cyan");
-new platform(5000, 400, "magenta");
-new platform(5100, 300, "yellow");
-new platform(5200, 100, "cyan");
-new platform(5400, 450, "yellow");
-new platform(5500, 300, "cyan");
-new platform(5600, 450, "magenta");
-new platform(5700, 100, "cyan");
-new platform(5900, 400, "yellow");
-new platform(6000, 220, "magenta");
-new platform(6100, 300, "cyan");
-new platform(6250, 200, "yellow");
-new platform(6380, 100, "magenta");
-new platform(6550, 450, "black");
-new platform(6550, 450, "black");
-new platform(6600, 450, "black");
-new platform(6650, 450, "black");
-new platform(6700, 450, "black");
-new platform(6750, 450, "black");
-new platform(6800, 450, "black");
-new platform(6850, 450, "black");
+
+function platformPrototype(x, y, color){
+	this.x = x;
+	this.y = y;
+	this.color = color;
+}
+
+
+
+
+/***
+ * where levels are actually defined (start with last one for pushing reasons)
+ */
+
+
+	
+level3 = new level(3,7450);
+
+level3.platforms =[new platformPrototype(450,450,"black"),
+		 new platformPrototype(
+		 550,
+		 450,
+		 "black"),
+	new platformPrototype(
+		 650,
+		 450,
+		 "black"),
+	new platformPrototype(
+		 700,
+		 450,
+		 "black"),
+	new platformPrototype(
+		 900,
+		 400,
+		 "black"),
+	new platformPrototype(
+		 1000,
+		 450,
+		 "magenta"),
+	new platformPrototype(
+		 1100,
+		 350,
+		 "yellow"),
+	new platformPrototype(
+		 1250,
+		 350,
+		 "yellow"),
+	new platformPrototype(
+		 1400,
+		 450,
+		 "cyan"),
+	new platformPrototype(
+		 1500,
+		 250,
+		 "magenta"),
+	new platformPrototype(
+		 1600,
+		 250,
+		 "magenta"),
+	new platformPrototype(
+		 1700,
+		 250,
+		 "magenta"),
+	new platformPrototype(
+		 1850,
+		 250,
+		 "cyan"),
+	new platformPrototype(
+		 1900,
+		 350,
+		 "black"),
+	new platformPrototype(
+		 2050,
+		 400,
+		 "magenta"),
+	new platformPrototype(
+		 2150,
+		 200,
+		 "yellow"),
+	new platformPrototype(
+		 2200,
+		 300,
+		 "magenta"),
+	new platformPrototype(
+		 2300,
+		 250,
+		 "cyan"),
+	new platformPrototype(
+		 2550,
+		 200,
+		 "cyan"),
+	new platformPrototype(
+		 2700,
+		 450,
+		 "yellow"),
+	new platformPrototype(
+		 2800,
+		 300,
+		 "yellow"),
+	new platformPrototype(
+		 2950,
+		 400,
+		 "cyan"),
+	new platformPrototype(
+		 3050,
+		 200,
+		 "magenta"),
+	new platformPrototype(
+		 3200,
+		 450,
+		 "yellow"),
+	new platformPrototype(
+		 3300,
+		 450,
+		 "yellow"),
+	new platformPrototype(
+		 3300,
+		 200,
+		 "magenta"),
+	new platformPrototype(
+		 3400,
+		 450,
+		 "cyan"),
+	new platformPrototype(
+		 3400,
+		 150,
+		 "cyan"),
+	new platformPrototype(
+		 3500,
+		 400,
+		 "magenta"),
+	new platformPrototype(
+		 3500,
+		 200,
+		 "yellow"),
+	new platformPrototype(
+		 3700,
+		 400,
+		 "magenta"),
+	new platformPrototype(
+		 3800,
+		 450,
+		 "cyan"),
+	new platformPrototype(
+		 3850,
+		 350,
+		 "cyan"),
+	new platformPrototype(
+		 4000,
+		 250,
+		 "magenta"),
+	new platformPrototype(
+		 4170,
+		 450,
+		 "yellow"),
+	new platformPrototype(
+		 4300,
+		 400,
+		 "cyan"),
+	new platformPrototype(
+		 4400,
+		 200,
+		 "yellow"),
+	new platformPrototype(
+		 4550,
+		 250,
+		 "cyan"),
+	new platformPrototype(
+		 4650,
+		 350,
+		 "magenta"),
+	new platformPrototype(
+		 4800,
+		 400,
+		 "cyan"),
+	new platformPrototype(
+		 4900,
+		 250,
+		 "cyan"),
+	new platformPrototype(
+		 5050,
+		 400,
+		 "yellow"),
+	new platformPrototype(
+		 5200,
+		 300,
+		 "cyan"),
+	new platformPrototype(
+		 5350,
+		 450,
+		 "magenta"),
+	new platformPrototype(
+		 5500,
+		 100,
+		 "cyan"),
+	new platformPrototype(
+		 5650,
+		 300,
+		 "yellow"),
+	new platformPrototype(
+		 5750,
+		 400,
+		 "yellow"),
+	new platformPrototype(
+		 5850,
+		 220,
+		 "magenta"),
+	new platformPrototype(
+		 6000,
+		 350,
+		 "cyan"),
+	new platformPrototype(
+		 6150,
+		 200,
+		 "yellow"),
+	new platformPrototype(
+		 6250,
+		 150,
+		 "magenta"),
+	new platformPrototype(
+		 6350,
+		 250,
+		 "cyan"),
+	new platformPrototype(
+		 6450,
+		 450,
+		 "magenta"),
+	new platformPrototype(
+		 6550,
+		 450,
+		 "yellow"),
+	new platformPrototype(
+		 6650,
+		 450,
+		 "cyan"),
+	new platformPrototype(
+		 6700,
+		 250,
+		 "yellow"),
+	new platformPrototype(
+		 6850,
+		 350,
+		 "magenta"),
+	new platformPrototype(
+		 7050,
+		 450,
+		 "black"),
+	new platformPrototype(
+		 7150,
+		 450,
+		 "black"),
+	new platformPrototype(
+		 7250,
+		 450,
+		 "black"),
+	new platformPrototype(
+		 7350,
+		 450,
+		 "black")];
+
+level3.vPlatforms = [new platformPrototype(
+		 1700,
+		 0,
+		 "yellow"),
+	new platformPrototype(
+		 2400,
+		 0,
+		 "magenta"),
+	new platformPrototype(
+		 3600,
+		 200,
+		 "magenta"),
+	new platformPrototype(
+		 5150,
+		 0,
+		 "yellow"),
+	new platformPrototype(
+		 5450,
+		 0,
+		 "cyan"),
+	new platformPrototype(
+		 5950,
+		 0,
+		 "magenta"),
+	new platformPrototype(
+		 6600,
+		 0,
+		 "cyan"),
+	new platformPrototype(
+		 6800,
+		 0,
+		 "magenta"),
+	new platformPrototype(
+		 7000,
+		 0,
+		 "yellow")];
+
+
+var level2 = new level(2,6850);
+
+level2.platforms = [
+new platformPrototype(
+		 0,
+		 550,
+		 "black"),
+	new platformPrototype(
+		 550,
+		 350,
+		 "black"),
+	new platformPrototype(
+		 700,
+		 450,
+		 "black"),
+	new platformPrototype(
+		 800,
+		 350,
+		 "black"),
+	new platformPrototype(
+		 950,
+		 250,
+		 "cyan"),
+	new platformPrototype(
+		 1100,
+		 350,
+		 "black"),
+	new platformPrototype(
+		 1200,
+		 450,
+		 "magenta"),
+	new platformPrototype(
+		 1300,
+		 250,
+		 "yellow"),
+	new platformPrototype(
+		 1400,
+		 150,
+		 "magenta"),
+	new platformPrototype(
+		 1600,
+		 450,
+		 "cyan"),
+	new platformPrototype(
+		 1750,
+		 250,
+		 "cyan"),
+	new platformPrototype(
+		 1880,
+		 150,
+		 "yellow"),
+	new platformPrototype(
+		 2100,
+		 450,
+		 "magenta"),
+	new platformPrototype(
+		 2200,
+		 150,
+		 "black"),
+	new platformPrototype(
+		 2200,
+		 200,
+		 "black"),
+	new platformPrototype(
+		 2200,
+		 450,
+		 "magenta"),
+	new platformPrototype(
+		 2300,
+		 350,
+		 "yellow"),
+	new platformPrototype(
+		 2420,
+		 350,
+		 "yellow"),
+	new platformPrototype(
+		 2500,
+		 450,
+		 "magenta"),
+	new platformPrototype(
+		 2600,
+		 250,
+		 "magenta"),
+	new platformPrototype(
+		 2700,
+		 400,
+		 "yellow"),
+	new platformPrototype(
+		 2800,
+		 300,
+		 "yellow"),
+	new platformPrototype(
+		 2900,
+		 300,
+		 "cyan"),
+	new platformPrototype(
+		 3000,
+		 200,
+		 "cyan"),
+	new platformPrototype(
+		 3200,
+		 450,
+		 "magenta"),
+	new platformPrototype(
+		 3300,
+		 450,
+		 "yellow"),
+	new platformPrototype(
+		 3400,
+		 200,
+		 "magenta"),
+	new platformPrototype(
+		 3600,
+		 450,
+		 "cyan"),
+	new platformPrototype(
+		 3700,
+		 400,
+		 "cyan"),
+	new platformPrototype(
+		 3800,
+		 400,
+		 "magenta"),
+	new platformPrototype(
+		 3900,
+		 400,
+		 "yellow"),
+	new platformPrototype(
+		 4000,
+		 400,
+		 "cyan"),
+	new platformPrototype(
+		 4100,
+		 400,
+		 "yellow"),
+	new platformPrototype(
+		 4200,
+		 350,
+		 "cyan"),
+	new platformPrototype(
+		 4300,
+		 250,
+		 "magenta"),
+	new platformPrototype(
+		 4500,
+		 450,
+		 "yellow"),
+	new platformPrototype(
+		 4600,
+		 400,
+		 "cyan"),
+	new platformPrototype(
+		 4700,
+		 200,
+		 "yellow"),
+	new platformPrototype(
+		 4800,
+		 100,
+		 "cyan"),
+	new platformPrototype(
+		 5000,
+		 400,
+		 "magenta"),
+	new platformPrototype(
+		 5100,
+		 300,
+		 "yellow"),
+	new platformPrototype(
+		 5200,
+		 100,
+		 "cyan"),
+	new platformPrototype(
+		 5400,
+		 450,
+		 "yellow"),
+	new platformPrototype(
+		 5500,
+		 300,
+		 "cyan"),
+	new platformPrototype(
+		 5600,
+		 450,
+		 "magenta"),
+	new platformPrototype(
+		 5700,
+		 100,
+		 "cyan"),
+	new platformPrototype(
+		 5900,
+		 400,
+		 "yellow"),
+	new platformPrototype(
+		 6000,
+		 220,
+		 "magenta"),
+	new platformPrototype(
+		 6100,
+		 300,
+		 "cyan"),
+	new platformPrototype(
+		 6250,
+		 200,
+		 "yellow"),
+	new platformPrototype(
+		 6380,
+		 100,
+		 "magenta"),
+	new platformPrototype(
+		 6550,
+		 450,
+		 "black"),
+	new platformPrototype(
+		 6600,
+		 450,
+		 "black"),
+	new platformPrototype(
+		 6650,
+		 450,
+		 "black"),
+	new platformPrototype(
+		 6700,
+		 450,
+		 "black"),
+	new platformPrototype(
+		 6750,
+		 450,
+		 "black"),
+	new platformPrototype(
+		 6800,
+		 450,
+		 "black"),
+	new platformPrototype(
+		 6850,
+		 450,
+		 "black")];
+
+level1 = new level(1,6950);
+
+level1.platforms = [new platform(550, 350, "black"),
+new platformPrototype(700, 450, "black"),
+new platformPrototype(800, 350, "black"),
+new platformPrototype(950, 250, "cyan"),
+new platformPrototype(1100, 350, "black"),
+new platformPrototype(1200, 450, "magenta"),
+new platformPrototype(1300, 250, "yellow"),
+new platformPrototype(1400, 150, "magenta"),
+new platformPrototype(1600, 450, "cyan"),
+new platformPrototype(1750, 250, "cyan"),
+new platformPrototype(1880, 150, "yellow"),
+new platformPrototype(2100, 450, "magenta"),
+new platformPrototype(2200, 150, "black"),
+new platformPrototype(2200, 200, "black"),
+new platformPrototype(2200, 450, "magenta"),
+new platformPrototype(2300, 350, "cyan"),
+new platformPrototype(2420, 350, "yellow"),
+new platformPrototype(2500, 450, "magenta"),
+new platformPrototype(2600, 250, "magenta"),
+new platformPrototype(2700, 400, "yellow"),
+new platformPrototype(2800, 300, "yellow"),
+new platformPrototype(2900, 300, "cyan"),
+new platformPrototype(3000, 200, "cyan"),
+new platformPrototype(3200, 450, "magenta"),
+new platformPrototype(3300, 450, "yellow"),
+new platformPrototype(3400, 200, "magenta"),
+new platformPrototype(3600, 450, "cyan"),
+new platformPrototype(3700, 400, "cyan"),
+new platformPrototype(3800, 400, "magenta"),
+new platformPrototype(3900, 400, "yellow"),
+new platformPrototype(4000, 400, "cyan"),
+new platformPrototype(4100, 400, "yellow"),
+new platformPrototype(4200, 350, "cyan"),
+new platformPrototype(4300, 250, "magenta"),
+new platformPrototype(4500, 450, "yellow"),
+new platformPrototype(4600, 400, "cyan"),
+new platformPrototype(4700, 200, "yellow"),
+new platformPrototype(4800, 100, "cyan"),
+new platformPrototype(5000, 400, "magenta"),
+new platformPrototype(5100, 300, "yellow"),
+new platformPrototype(5200, 100, "cyan"),
+new platformPrototype(5400, 450, "yellow"),
+new platformPrototype(5500, 300, "cyan"),
+new platformPrototype(5600, 450, "magenta"),
+new platformPrototype(5700, 100, "cyan"),
+new platformPrototype(5900, 400, "yellow"),
+new platformPrototype(6000, 220, "magenta"),
+new platformPrototype(6100, 300, "cyan"),
+new platformPrototype(6250, 200, "yellow"),
+new platformPrototype(6380, 100, "magenta"),
+new platformPrototype(6550, 450, "black"),
+new platformPrototype(6550, 450, "black"),
+new platformPrototype(6600, 450, "black"),
+new platformPrototype(6650, 450, "black"),
+new platformPrototype(6700, 450, "black"),
+new platformPrototype(6750, 450, "black"),
+new platformPrototype(6800, 450, "black"),
+new platformPrototype(6850, 450, "black")]
+
+level1.vPlatforms = []
+
+level1.floors = []
