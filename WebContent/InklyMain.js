@@ -363,7 +363,7 @@ function inky() {
 	//the platform inky is colliding with
 	this.platform = undefined;
 	
-	//the collidabel inky is colliding with
+	//the collidable inky is colliding with
 	this.collidable = undefined
 	
 	//used to calculate when inky started its last jump
@@ -399,7 +399,6 @@ inky.Sprite.update = function(d) {
 	
 	// inky jumping
 	if (gInput.jump) {
-		//if inky isn't falling, isn't touching anything, and 
 		if (!inky.falling && !inky.colliding && inky.hoverTime < hoverTime){
 			inky.hovering = true;
 			console.log("hovering!")
@@ -413,7 +412,7 @@ inky.Sprite.update = function(d) {
 				inky.hovering = false;
 				inky.falling = true;
 				inky.velocity += gravity;
-				//console.log("done hovering!");
+				console.log("done hovering!");
 			}
 		}
 		
@@ -513,8 +512,8 @@ inky.Sprite.update = function(d) {
 
 	// this changes inky's location finally
 	this.y += inky.velocity;
-
-	background.x -= runSpeed;
+	if (!inky.dead)
+		background.x -= runSpeed;
 	
 	//Update variables here for next cycle
 	if (inky.previousY < inky.Sprite.y) {
@@ -525,9 +524,13 @@ inky.Sprite.update = function(d) {
 	if (this.y >= canvas.height)
 		death();
 
+	vPlatformCollide();
 	
 	inky.previousX = inky.Sprite.x;
 	inky.previousY = inky.Sprite.y;
+	
+	if (inky.dead)
+		death();
 	
 	tick();
 }
@@ -655,6 +658,13 @@ function updatePlatforms() {
 			platforms[i].tangible = true;
 		}
 	}
+	for (var i = 0; i < vPlatforms.length; i++){
+		if (colorMode == vPlatforms[i].color){
+			vPlatforms[i].tangible = false;
+		} else{
+			vPlatforms[i].tangible = true;
+		}
+	}
 
 }
 
@@ -772,7 +782,7 @@ function whichCollide(){
 
 function vPlatformCollide(){
 	for (var i = 0; i < vPlatforms.length; i++){
-		if (spriteCollide(vPlatforms[i].sprite)){
+		if (spriteCollide(vPlatforms[i].sprite) && vPlatforms[i].tangible){
 			death();
 		}
 	}
@@ -799,10 +809,16 @@ function clearLevel() {
 
 // TODO complete function
 function death() {
-	inky.Sprite.y = canvas.height - 200;
-	inky.velocity = 0;
-	background.x = 0;
-	deaths += 1;
+	inky.dead = true;
+	deathTimerTime++;
+	
+	if (deathTimerTime >= deathTimer){
+		inky.Sprite.y = canvas.height - 200;
+		inky.velocity = 0;
+		background.x = 0;
+		deaths += 1;
+		inky.dead = false;
+	}
 }
 
 
@@ -1291,56 +1307,56 @@ var level2 = {
 	} ]
 }
 
-// "blackV" did not work. Changed to .gif.
+// "black" did not work. Changed to .gif.
 var level2V = {
 	"platformVs" : [
 	// First death wall is for training the player
 	{
 		"x" : 800,
 		"y" : 0,
-		"color" : "magentaV"
+		"color" : "magenta"
 	},
 	// Begin jumps
 	{
 		"x" : 1200,
 		"y" : 0,
-		"color" : "cyanV"
+		"color" : "cyan"
 	}, {
 		"x" : 1700,
 		"y" : 0,
-		"color" : "yellowV"
+		"color" : "yellow"
 	}, {
 		"x" : 2400,
 		"y" : 0,
-		"color" : "magentaV"
+		"color" : "magenta"
 	}, {
 		"x" : 3600,
 		"y" : 200,
-		"color" : "magentaV"
+		"color" : "magenta"
 	}, {
 		"x" : 5150,
 		"y" : 0,
-		"color" : "yellowV"
+		"color" : "yellow"
 	}, {
 		"x" : 5450,
 		"y" : 0,
-		"color" : "cyanV"
+		"color" : "cyan"
 	}, {
 		"x" : 5950,
 		"y" : 0,
-		"color" : "magentaV"
+		"color" : "magenta"
 	}, {
 		"x" : 6600,
 		"y" : 0,
-		"color" : "cyanV"
+		"color" : "cyan"
 	}, {
 		"x" : 6800,
 		"y" : 0,
-		"color" : "magentaV"
+		"color" : "magenta"
 	}, {
 		"x" : 7000,
 		"y" : 0,
-		"color" : "yellowV"
+		"color" : "yellow"
 	},
 	// Rest of platforms placed after level ends.
 	// Loop will stop drawing entirely when either number of platforms or walls
@@ -1348,231 +1364,231 @@ var level2V = {
 	{
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, {
 		"x" : 8000,
 		"y" : 0,
-		"color" : "blackV"
+		"color" : "black"
 	}, ]
 }
 
@@ -1596,7 +1612,7 @@ for (var i = 0; i < 80; i++) {
 // }
 */
 
-//new platformV(500, 200, "cyan");
+new platformV(500, 200, "cyan");
 new floor(0, 500);
 new platform(550, 350, "black");
 new platform(700, 450, "black");
