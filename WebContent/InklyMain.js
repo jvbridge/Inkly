@@ -14,6 +14,7 @@ gInput.addBool(50, "magenta");
 gInput.addBool(51, "yellow");
 gInput.addBool(32, "jump");
 gInput.addBool(27, "escape");
+gInput.addBool(59, "god");
 gInput.addBool(92, "cheat");
 
 background = new Sprite;
@@ -62,11 +63,11 @@ var colorMode = "none";
 var COLOR_MODE_DEFAULT = "none";
 
 // rate at which velocity changes
-var gravity = 2;
+var gravity = 3;
 var GRAVITY_DEFAULT = 2;
 
 // fastest inky can fall
-var terminalVelocity = 8;
+var terminalVelocity = 13;
 var TERMINAL_VELOCITY_DEFAULT = 8;
 
 // variable for calculating Inky's jump height
@@ -236,6 +237,7 @@ mainMenu.init = function() {
 		currentLevelNumber = 1;
 		currentLevel = levels.pop();
 		buildLevel();
+		setRandomColor();
 	}
 
 	var resumeGame = new TextButton("Resume Game");
@@ -265,8 +267,8 @@ gameScreen.init = function() {
 	this.width = canvas.width;
 	this.height = canvas.height;
 	this.Stage.addChild(inky.Sprite);
-	this.Stage.addChild(palette)
-	this.Stage.addChild(background)
+	this.Stage.addChild(palette);
+	this.Stage.addChild(background);
 }
 
 var pauseMenu = new Screen(false, true);
@@ -499,11 +501,12 @@ inky.Sprite.update = function(d) {
 			// TODO: replace console logs here
 		}
 
-		if (inky.collidable != undefined
-				&& inky.previousY + inky.Sprite.height <= inky.collidable.y
-						- inky.previousVelocity) {
-			inky.Sprite.y = inky.collidable.y - inky.height;
-		}
+		/*
+		 * TODO: fix this shitty code if (inky.collidable != undefined &&
+		 * inky.previousY + inky.Sprite.height <= inky.collidable.y -
+		 * inky.previousVelocity) { inky.Sprite.y = inky.collidable.y -
+		 * inky.height; }
+		 */
 
 		if (inky.platform != undefined) {
 			/*
@@ -603,13 +606,13 @@ function platformV(x, y, color) {
 
 	// vertical
 	if (color == "cyan")
-		platVSprite.image = Textures.load("DeathWallC.png");
+		platVSprite.image = Textures.load("PlatformCV.png");
 	if (color == "magenta")
-		platVSprite.image = Textures.load("DeathWallM.png");
+		platVSprite.image = Textures.load("PlatformMV.png");
 	if (color == "yellow")
-		platVSprite.image = Textures.load("DeathWallY.png");
+		platVSprite.image = Textures.load("PlatformYV.png");
 	if (color == "black")
-		platVSprite.image = Textures.load("DeathWallB.png");
+		platVSprite.image = Textures.load("PlatformBV.png");
 	if (color == "dotV")
 		platVSprite.image = Textures.load("PlatformDOTV.png");
 
@@ -668,16 +671,32 @@ function updatePlatforms() {
 	for (var i = 0; i < platforms.length; i++) {
 		if (colorMode == platforms[i].color) {
 			platforms[i].tangible = false;
-			// TODO: change texture
+			platforms[i].sprite.image = Textures.load("PlatformDOT.png")
 		} else {
 			platforms[i].tangible = true;
+			if (platforms[i].color == "cyan")
+				platforms[i].sprite.image = Textures.load("PlatformC.png");
+			if (platforms[i].color == "magenta")
+				platforms[i].sprite.image = Textures.load("PlatformM.png");
+			if (platforms[i].color == "yellow")
+				platforms[i].sprite.image = Textures.load("PlatformY.png");
 		}
+		if (platforms[i].color == "black")
+			platforms[i].sprite.image = Textures.load("PlatformB.gif");
 	}
 	for (var i = 0; i < vPlatforms.length; i++) {
 		if (colorMode == vPlatforms[i].color) {
 			vPlatforms[i].tangible = false;
+			vPlatforms[i].sprite.image = Textures.load("PlatformDOTV.png");
 		} else {
 			vPlatforms[i].tangible = true;
+
+			if (vPlatforms[i].color == "cyan")
+				vPlatforms[i].sprite.image = Textures.load("PlatformCV.png");
+			if (vPlatforms[i].color == "magenta")
+				vPlatforms[i].sprite.image = Textures.load("PlatformMV.png");
+			if (vPlatforms[i].color == "yellow")
+				vPlatforms[i].sprite.image = Textures.load("PlatformYV.png");
 		}
 	}
 
@@ -782,6 +801,35 @@ function vPlatformCollide() {
 	}
 }
 
+function setRandomColor() {
+	var colorChoice = Math.floor((Math.random() * 3) + 1);
+
+	if (colorChoice == 1) {
+		colorMode = "cyan";
+		updatePlatforms();
+		palette.image = Textures.load("2.png");
+		gameScreen.image = Textures.load("BackgroundC.png");
+		console.log("Random cyan!");
+	}
+	if (colorChoice == 2) {
+		colorMode = "yellow";
+		updatePlatforms();
+		palette.image = Textures.load("3.png");
+		gameScreen.image = Textures.load("BackgroundY.png");
+		console.log("Random yellow!");
+	}
+	if (colorChoice == 3) {
+		colorMode = "magenta";
+		updatePlatforms();
+		palette.image = Textures.load("1.png");
+		gameScreen.image = Textures.load("BackgroundM.png");
+		console.log("Random magenta!");
+	}
+	if (colorChoice > 3 || colorChoice < 1)
+		console.log("random doesn't work");
+
+}
+
 // clears all sprites from the level and frees the arrays that reference them
 function clearLevel() {
 	console.log("clearing level!")
@@ -816,14 +864,7 @@ function clearLevel() {
 
 // TODO add FX
 function death() {
-	
-	gameScreen.image = Textures.load("BackgroundB.png");
-	
-	colorMode = "cyan";
-	updatePlatforms();
-	palette.image = Textures.load("2.png");
-	gameScreen.image = Textures.load("BackgroundC.png");
-	
+
 	inky.dead = true;
 	deathTimerTime++;
 	inky.Sprite.visible = false;
@@ -836,6 +877,8 @@ function death() {
 		deathTimerTime = 0;
 		inky.Sprite.visible = true;
 		inky.dead = false;
+
+		setRandomColor()
 	}
 }
 
@@ -894,9 +937,14 @@ function buildLevel() {
 	for (i = 0; i < currentLevel.floors.length; i++) {
 		new floor(currentLevel.floors[i].start, currentLevel.floors[i].end);
 	}
-	for (var i = 0; i < canvas.height; i += 100) {
-		new platformV(550, i, "cyan");
-	}
+	/*
+	 * for (var i = 0; i < canvas.height; i += 100) { new platformV(550, i,
+	 * "cyan"); }
+	 */
+
+	deathWall = new platformV(550, 0, "cyan");
+	deathWall.sprite.height = canvas.height;
+
 	new floor(0, 500);
 	background.addChild(currentLevel.finish);
 }
@@ -906,6 +954,7 @@ function platformPrototype(x, y, color) {
 	this.y = y;
 	this.color = color;
 }
+
 
 /**
  * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
