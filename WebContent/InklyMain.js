@@ -14,6 +14,7 @@ gInput.addBool(50, "magenta");
 gInput.addBool(51, "yellow");
 gInput.addBool(32, "jump");
 gInput.addBool(27, "escape");
+gInput.addBool(92, "cheat");
 
 
 background = new Sprite;
@@ -66,8 +67,8 @@ var gravity = 2;
 var GRAVITY_DEFAULT = 2;
 
 // fastest inky can fall
-var terminalVelocity = 6;
-var TERMINAL_VELOCITY_DEFAULT = 6
+var terminalVelocity = 10;
+var TERMINAL_VELOCITY_DEFAULT = 10;
 
 // variable for calculating Inky's jump height
 var jumpHeight = 15;
@@ -78,12 +79,12 @@ var jumpSpeed = -16;
 var JUMP_SPEED_DEFAULT = -16
 
 // how fast the level moves
-var runSpeed = 3;
-var RUN_SPEED_DEFAULT = 3;
+var runSpeed = 5;
+var RUN_SPEED_DEFAULT = 5;
 
 // used for how long a jump floats in the air
-var hoverTime = 20;
-var HOVER_TIME_DEFAULT = 20;
+var hoverTime =15;
+var HOVER_TIME_DEFAULT = 15;
 
 /*******************************************************************************
  * COUNTERS
@@ -201,8 +202,8 @@ ScreenManager.prototype.draw = function(ctx) {
 
 var screenManager = new ScreenManager();
 
-world.addChild(screenManager);
 
+world.addChild(screenManager);
 // creates the main menu screen.
 
 var mainMenu = new Screen(false, false);
@@ -263,8 +264,6 @@ gameScreen.init = function() {
 	// Since we set a background we want the screen to fill the canvas
 	this.width = canvas.width;
 	this.height = canvas.height;
-	// TODO: put all in game stuff here
-
 	this.Stage.addChild(inky.Sprite);
 	this.Stage.addChild(palette)
 	this.Stage.addChild(background)
@@ -333,7 +332,7 @@ settingsMenu.init = function() {
 function inky() {
 	// PLACEHOLDER current sprite spawning. Not used here in final version
 	inkySprite = new Sprite();
-	inkySprite.x = 20;
+	inkySprite.x = 145;
 	inkySprite.y = canvas.height - 200;
 	inkySprite.height = 40;
 	inkySprite.width = 40;
@@ -377,6 +376,8 @@ function inky() {
 	// used to calculate when inky started its last jump
 	this.jumpStart = 0;
 	
+	this.jumped = true;
+	
 	// previous velocity
 	this.previousVelocity = 0;
 	
@@ -392,6 +393,11 @@ inky = new inky();
 
 // update function for inky. All inky behavior defined here
 inky.Sprite.update = function(d) {
+	
+	if(inky.previousX != inky.Sprite.x){
+		console.log("bug");
+	}
+	
 	
 	inky.previousVelocity = inky.velocity; 
 	
@@ -435,7 +441,7 @@ inky.Sprite.update = function(d) {
 			}
 		}
 		
-		if (jumpCollide()) {
+		if (inky.colliding) {
 			if (inky.collidable != undefined) {
 				if(inky.collidable.y >= inky.previousY){
 					inky.hoverTime = 0;
@@ -480,6 +486,10 @@ inky.Sprite.update = function(d) {
 		gameScreen.image = Textures.load("BackgroundM.png");
 		console.log("magenta!");
 	}
+	if(gInput.cheat){
+		console.log("cheat!");
+		finish();
+	}
 
 	// this is seeing if inky really should fall
 	
@@ -500,10 +510,10 @@ inky.Sprite.update = function(d) {
 			console.log ("Inky curr: " + (inky.Sprite.y + inky.Sprite.height));
 			console.log("platform y: " + (inky.platform.y - inky.previousVelocity));*/
 		}
-		if (inky.platform != undefined && inky.previousY + inky.Sprite.height
+		/*if (inky.platform != undefined && inky.previousY + inky.Sprite.height
 				<= inky.platform.y - inky.previousVelocity){
 			inky.Sprite.y = inky.platform.y - inky.height;
-		}
+		}*/
 	}
 
 	// this changes inky's location finally
@@ -548,7 +558,7 @@ function platform(x, y, color) {
 	platSprite = new Sprite
 	platSprite.x = x;
 	platSprite.y = y;
-	platSprite.height = 30;
+	platSprite.height = 15;
 	platSprite.width = 100;
 
 	// TODO: placeholder texture, needs an update and a black one
@@ -629,7 +639,6 @@ function floor(start, end) {
 }
 
 platform.update = function(d) {
-	// spriteCollide(this.sprite);
 }
 /** ************************************************************************ */
 /* Helper functions */
@@ -743,17 +752,6 @@ function platformCollide() {
 	return false;
 }
 
-// returns the sprite of the platform inky is colliding with
-// only use if inky IS collidng with something
-function whichPlatform(){
-	for (var i = 0; i < platforms.length; i++) {
-		if (spriteCollide(platforms[i].sprite) && platforms[i].tangible) {
-			return platforms[i].sprite;
-		}
-	}
-	return false;
-}
-
 /*
  * returns true if inky is colliding with an object it can jump on that is not a
  * platform also sets the reference in inky to the sprite that it's colliding
@@ -768,17 +766,6 @@ function jumpCollide() {
 		}
 	}
 	inky.collidable = undefined;
-	return false;
-}
-
-// returns the sprite inky is colliding with.
-function whichCollide(){
-	for (var i = 0; i < jumpables.length; i++) {
-		if (spriteCollide(jumpables[i].sprite)) {
-			inky.colliding = true;
-			return jumpables[i].sprite
-		}
-	}
 	return false;
 }
 
@@ -851,9 +838,9 @@ function finish(){
 }
 
 
-/*
+/* ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  * LEVEL HANDLING
- */
+   :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
 
 function level(levelNumber, levelLength){
 	this.levelNumber = levelNumber;
@@ -909,9 +896,9 @@ function platformPrototype(x, y, color){
 
 
 
-/***
+/**:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  * where levels are actually defined (start with last one for pushing reasons)
- */
+ :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
 
 
 	
