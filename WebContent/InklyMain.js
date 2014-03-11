@@ -30,6 +30,17 @@ palette.x = canvas.width / 2 - palette.width / 2;
 palette.y = 10;
 palette.image = Textures.load("0.png");
 
+
+/*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+  LOAD MUSIC/SOUNDS
+ :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+
+var theme = new Audio("mainsong.mp3"); 
+
+var fallDeath = new Audio("splat3.mp3");
+
+var wallDeath = new Audio("splat2.wav");
+
 /*******************************************************************************
  * ARRAYS
  ******************************************************************************/
@@ -269,6 +280,7 @@ gameScreen.init = function() {
 	this.Stage.addChild(inky.Sprite);
 	this.Stage.addChild(palette);
 	this.Stage.addChild(background);
+	theme.play();
 }
 
 var pauseMenu = new Screen(false, true);
@@ -535,9 +547,11 @@ inky.Sprite.update = function(d) {
 	} else
 		inky.falling = false;
 
-	if (this.y >= canvas.height)
+	if (this.y >= canvas.height){
+		fallDeath.play();
 		death();
-
+	}
+		
 	vPlatformCollide();
 
 	inky.previousX = inky.Sprite.x;
@@ -699,7 +713,6 @@ function updatePlatforms() {
 				vPlatforms[i].sprite.image = Textures.load("PlatformYV.png");
 		}
 	}
-
 }
 
 // returns true if Inky is colliding with a sprite, false if it's not
@@ -796,6 +809,7 @@ function jumpCollide() {
 function vPlatformCollide() {
 	for (var i = 0; i < vPlatforms.length; i++) {
 		if (spriteCollide(vPlatforms[i].sprite) && vPlatforms[i].tangible) {
+			wallDeath.play();
 			death();
 		}
 	}
