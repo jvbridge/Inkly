@@ -37,6 +37,18 @@ palette.image = Textures.load("0.png");
 
 var theme = new Audio("mainsong.mp3"); 
 
+theme.addEventListener('ended', function() {
+    this.currentTime = 0;
+    this.play();
+}, false);
+
+var menuTheme = new Audio("menu.mp3"); 
+
+menuTheme.addEventListener('ended', function() {
+    this.currentTime = 0;
+    this.play();
+}, false);
+
 var fallDeath = new Audio("splat3.mp3");
 
 var wallDeath = new Audio("splat2.wav");
@@ -229,6 +241,8 @@ mainMenu.init = function() {
 	 * since the size of the game is up for debate, the image will be assumed to
 	 * be variable.
 	 */
+	
+	menuTheme.play();
 	this.width = canvas.width;
 	this.height = canvas.height;
 
@@ -280,6 +294,7 @@ gameScreen.init = function() {
 	this.Stage.addChild(inky.Sprite);
 	this.Stage.addChild(palette);
 	this.Stage.addChild(background);
+	menuTheme.pause();
 	theme.play();
 }
 
@@ -882,8 +897,18 @@ function death() {
 	inky.dead = true;
 	deathTimerTime++;
 	inky.Sprite.visible = false;
+	
+	
 
 	if (deathTimerTime >= deathTimer) {
+		
+		//this refreshes the textures on the black platforms and floors
+		for(var i = 0; i < platforms.length; i++){
+			if(platforms[i].color == "black"){
+				platforms[i].sprite.image = Textures.load("PlatformDOT.png");
+				platforms[i].sprite.image = Textures.load("PlatformB.gif");
+			}
+		}
 		inky.Sprite.y = canvas.height - 200;
 		inky.velocity = 0;
 		background.x = 0;
