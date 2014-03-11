@@ -9,12 +9,26 @@ initGame("myCanvas");
  * menu map to 1, 2, 3, space, and escape respectively. In future releases we
  * can choose to make they keys captured from another menu
  */
+
+//1 does cyan
 gInput.addBool(49, "cyan");
+
+//2 does magenta
 gInput.addBool(50, "magenta");
+
+//3 does yellow
 gInput.addBool(51, "yellow");
+
+//space does jump
 gInput.addBool(32, "jump");
+
+//escape does menu
 gInput.addBool(27, "escape");
+
+//semi-colin for god mode
 gInput.addBool(59, "god");
+
+//backslash to go to the next level
 gInput.addBool(92, "cheat");
 
 background = new Sprite;
@@ -108,6 +122,8 @@ var RUN_SPEED_DEFAULT = 5;
 // used for how long a jump floats in the air
 var hoverTime = 15;
 var HOVER_TIME_DEFAULT = 15;
+
+var inGame = false;
 
 /*******************************************************************************
  * COUNTERS
@@ -272,6 +288,10 @@ mainMenu.init = function() {
 	resumeGame.label.fontSize = 30;
 	resumeGame.setLabelColors("#aaaaaa", "#ffffff", "#ff0000");
 	this.gui.addChild(resumeGame);
+	
+	resumeGame.func = function (){
+		screenManager.push(gameScreen);
+	}
 
 	var credits = new TextButton("Credits");
 	credits.y = 197;
@@ -280,7 +300,6 @@ mainMenu.init = function() {
 	credits.label.fontSize = 30;
 	credits.setLabelColors("#aaaaaa", "#ffffff", "#ff0000");
 	this.gui.addChild(credits);
-
 }
 
 var gameScreen = new Screen(false, true);
@@ -366,7 +385,13 @@ function inky() {
 	inkySprite.height = 40;
 	inkySprite.width = 40;
 	// temporary place holder until we get the next image
-	inkySprite.image = Textures.load("Inky.png");
+	inkySprite.image = Textures.load("running-25.png");
+	inkySprite.frameWidth = 280;
+	inkySprite.frameHeight = 350;
+	inkySprite.frameCount = 18;
+
+	
+	
 	this.Sprite = inkySprite;
 
 	// all temp variables here
