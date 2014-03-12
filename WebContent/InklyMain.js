@@ -355,7 +355,6 @@ gInput.addFunc(27, function() {
 	if (screenManager.screens.find(gameScreen)
 			&& !screenManager.screens.find(pauseMenu)) {
 		screenManager.push(pauseMenu);
-
 	}
 })
 
@@ -552,7 +551,6 @@ inky.Sprite.update = function(d) {
 		if (inky.collidable != undefined) {
 			// TODO: replace console logs here
 		}
-
 		/*
 		 * TODO: fix this shitty code if (inky.collidable != undefined &&
 		 * inky.previousY + inky.Sprite.height <= inky.collidable.y -
@@ -889,28 +887,30 @@ function clearLevel() {
 	console.log("clearing level!")
 	for (var i = 0; i < collidables.length; i++) {
 		collidables[i].sprite.visible = false;
-		collidables[i].sprite.x = 0;
-		collidables[i].sprite.y = 0;
-		collidables.pop();
+		collidables[i].sprite.x = -100;
+		collidables[i].sprite.y = -100;
 	}
+	collidabels = [];
 	for (var i = 0; i < platforms.length; i++) {
 		platforms[i].tangible = false;
-		platforms[i].sprite.x = 0;
-		platforms[i].sprite.y = 0;
-		platforms.pop();
+		platforms[i].sprite.visible = false;
+		platforms[i].sprite.x = -100;
+		platforms[i].sprite.y = -100;
 	}
+	platforms=[];
 	for (var i = 0; i < jumpables.length; i++) {
-		jumpables[i].sprite.x = 0;
-		jumpables[i].sprite.y = 0;
+		jumpables[i].sprite.x = -100;
+		jumpables[i].sprite.y = -100;
 		jumpables[i].sprite.visible = false;
-		jumpables.pop();
 	}
+	jumpables = [];
 	for (var i = 0; i < vPlatforms.length; i++) {
 		vPlatforms[i].tangible = false;
-		vPlatforms[i].sprite.x = 0;
-		vPlatforms[i].sprite.y = 0;
-		vPlatforms.pop();
+		vPlatforms[i].visible = false;
+		vPlatforms[i].sprite.x = -100;
+		vPlatforms[i].sprite.y = -100;
 	}
+	vPlatforms = [];
 	currentLevel.finish.visible = false;
 	currentLevel.finish.x = -500;
 	currentLevel.finish.y = 1000;
@@ -1001,11 +1001,7 @@ function buildLevel() {
 	for (i = 0; i < currentLevel.floors.length; i++) {
 		new floor(currentLevel.floors[i].start, currentLevel.floors[i].end);
 	}
-	/*
-	 * for (var i = 0; i < canvas.height; i += 100) { new platformV(550, i,
-	 * "cyan"); }
-	 */
-
+	
 	deathWall = new platformV(550, 0, "cyan");
 	deathWall.sprite.height = canvas.height;
 
@@ -1320,7 +1316,7 @@ level2.platforms = [ new platformPrototype(0, 450, "black"),
 
 level1 = new level(1, 6950);
 
-level1.platforms = [ new platform(550, 350, "black"),
+level1.platforms = [ new platformPrototype(550, 350, "black"),
 		new platformPrototype(700, 450, "black"),
 		new platformPrototype(800, 350, "black"),
 		new platformPrototype(950, 250, "cyan"),
