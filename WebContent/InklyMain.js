@@ -631,7 +631,7 @@ function platform(x, y, color) {
 	if (color == "yellow")
 		platSprite.image = Textures.load("PlatformY.png");
 	if (color == "black")
-		platSprite.image = Textures.load("PlatformB.gif");
+		platSprite.image = Textures.load("PlatformB.png");
 
 	this.sprite = platSprite;
 
@@ -689,7 +689,7 @@ function floor(start, end) {
 	floorSprite.y = canvas.height - 30;
 	floorSprite.height = 30;
 	floorSprite.width = (end - start);
-	floorSprite.image = Textures.load("PlatformB.gif");
+	floorSprite.image = Textures.load("PlatformB.png");
 
 	this.sprite = floorSprite;
 
@@ -736,7 +736,7 @@ function updatePlatforms() {
 				platforms[i].sprite.image = Textures.load("PlatformY.png");
 		}
 		if (platforms[i].color == "black")
-			platforms[i].sprite.image = Textures.load("PlatformB.gif");
+			platforms[i].sprite.image = Textures.load("PlatformB.png");
 	}
 	for (var i = 0; i < vPlatforms.length; i++) {
 		if (colorMode == vPlatforms[i].color) {
@@ -931,7 +931,7 @@ function death() {
 		for(var i = 0; i < platforms.length; i++){
 			if(platforms[i].color == "black"){
 				platforms[i].sprite.image = Textures.load("PlatformDOT.png");
-				platforms[i].sprite.image = Textures.load("PlatformB.gif");
+				platforms[i].sprite.image = Textures.load("PlatformB.png");
 			}
 		}
 		inky.Sprite.y = canvas.height - 200;
