@@ -61,6 +61,12 @@ var fallDeath = new Audio("splat3.mp3");
 
 var wallDeath = new Audio("splat2.wav");
 
+var sound1 = new Audio("SOUND1.mp3");
+
+var sound2 = new Audio("SOUND2.mp3");
+
+var sound3 = new Audio("SOUND3.mp3");
+
 /*******************************************************************************
  * ARRAYS
  ******************************************************************************/
@@ -134,6 +140,7 @@ var totalDeaths = 0;
 
 // used to count how many cycles death should last for
 var deathTimer = 100;
+
 var deathTimerTime = 0;
 
 /** ************************************************************************ */
@@ -369,6 +376,41 @@ pauseMenu.init = function() {
 	
 }
 
+levelSummary = new Screen(false, true);
+
+levelSummary.init = function() {
+	this.width = canvas.width;
+	this.height = canvas.height;
+	this.gui.x = canvas.width / 2;
+	this.gui.y = canvas.height / 2;
+	
+	continueFunc = function(){
+			screenManager.push(gameScreen);
+	}
+	
+	var continueGame = new Button(continueFunc);
+	continueGame.y = 0;
+	continueGame.x = 0;
+	continueGame.height = canvas.height;
+	continueGame.width = canvas.width;
+	this.gui.addChild(continueGame);
+	
+	var resumeGame = new TextButton("");
+	resumeGame.y = 0;
+	resumeGame.center = 0;
+	resumeGame.label.dropShadow = false;
+	resumeGame.label.fontSize = 30;
+	resumeGame.setLabelColors("#aaaaaa", "#ffffff", "#ff0000");
+	this.gui.addChild(resumeGame);
+	
+	resumeGame.func = function (){
+			screenManager.push(gameScreen);
+	}
+	
+	
+	//TODO add sounds for end level
+}
+
 // This makes it so that escape will make the pause screen
 gInput.addFunc(27, function() {
 	if (screenManager.screens.find(gameScreen)
@@ -549,6 +591,8 @@ inky.Sprite.update = function(d) {
 		updatePlatforms();
 		palette.image = Textures.load("2.png");
 		gameScreen.image = Textures.load("BackgroundC.png");
+		if(!mute)
+			sound1.play();
 		console.log("cyan!");
 	}
 	if (gInput.yellow) {
@@ -556,6 +600,8 @@ inky.Sprite.update = function(d) {
 		updatePlatforms();
 		palette.image = Textures.load("3.png");
 		gameScreen.image = Textures.load("BackgroundY.png");
+		if(!mute)
+			sound2.play();
 		console.log("yellow!");
 	}
 	if (gInput.magenta) {
@@ -563,6 +609,8 @@ inky.Sprite.update = function(d) {
 		updatePlatforms();
 		palette.image = Textures.load("1.png");
 		gameScreen.image = Textures.load("BackgroundM.png");
+		if(!mute)
+			sound3.play();
 		console.log("magenta!");
 	}
 
@@ -894,24 +942,25 @@ function setRandomColor() {
 		updatePlatforms();
 		palette.image = Textures.load("2.png");
 		gameScreen.image = Textures.load("BackgroundC.png");
-		console.log("Random cyan!");
+		if(!mute)
+			sound1.play();
 	}
 	if (colorChoice == 2) {
 		colorMode = "yellow";
 		updatePlatforms();
 		palette.image = Textures.load("3.png");
 		gameScreen.image = Textures.load("BackgroundY.png");
-		console.log("Random yellow!");
+		if(!mute)
+			sound2.play();
 	}
 	if (colorChoice == 3) {
 		colorMode = "magenta";
 		updatePlatforms();
 		palette.image = Textures.load("1.png");
 		gameScreen.image = Textures.load("BackgroundM.png");
-		console.log("Random magenta!");
+		if(!mute)
+			sound3.play();
 	}
-	if (colorChoice > 3 || colorChoice < 1)
-		console.log("random doesn't work");
 
 }
 
@@ -951,7 +1000,6 @@ function clearLevel() {
 	currentLevel.finish.y = 1000;
 }
 
-// TODO add FX
 function death() {
 
 	inky.dead = true;
@@ -981,8 +1029,25 @@ function death() {
 	}
 }
 
-// TODO finish screen goes here
 function finish() {
+	
+	if(currentLevelNumber == 1)
+		levelSummary.image = Textures.load("LevelEnd1.png");
+	if(currentLevelNumber == 2)
+		levelSummary.image = Textures.load("LevelEnd2.png");
+	if(currentLevelNumber == 3)
+		levelSummary.image = Textures.load("LevelEnd3.png");
+	if(currentLevelNumber == 4)
+		levelSummary.image = Textures.load("LevelEnd4.png");
+	if(currentLevelNumber == 5){
+		levelSummary.image = Textures.load("GameEnd.png");
+		//TODO handle code for game over
+	}
+
+	screenManager.push(levelSummary);
+	screenManager.remove(gameScreen);
+	
+	
 	currentLevel = levels[currentLevelNumber];
 	currentLevelNumber++;
 	clearLevel();
