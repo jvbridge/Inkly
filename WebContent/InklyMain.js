@@ -1011,7 +1011,7 @@ function death() {
 	}
 
 	if (deathTimerTime >= deathTimer) {
-		
+		console.log("background at: " + background.x);
 		//this refreshes the textures on the black platforms and floors
 		for(var i = 0; i < platforms.length; i++){
 			if(platforms[i].color == "black"){
@@ -1047,10 +1047,9 @@ function finish() {
 	screenManager.push(levelSummary);
 	screenManager.remove(gameScreen);
 	
-	
+	clearLevel();
 	currentLevel = levels[currentLevelNumber];
 	currentLevelNumber++;
-	clearLevel();
 	background.x = 0;
 	buildLevel();
 	totalDeaths += deaths;
@@ -1297,6 +1296,7 @@ level3.platforms = [ new platformPrototype(0, 450, "black"),
 		new platformPrototype(3510, 220, "cyan"),
 		new platformPrototype(3630, 330, "yellow"),
 		new platformPrototype(3700, 300, "cyan"),
+		new platformPrototype(3800, 100, "cyan"),
 		new platformPrototype(3800, 400, "magenta"),
 		new platformPrototype(4000, 090, "yellow"),
 		new platformPrototype(4100, 180, "cyan"),
@@ -1387,6 +1387,7 @@ level4.platforms = [ new platformPrototype(0, 450, "black"),
 		new platformPrototype(5500, 0, "cyanV"),
 		new platformPrototype(5600, 100, "cyan"),
 		new platformPrototype(5700, 200, "magenta"),
+		new platformPrototype(5800, 100, "cyan"),
 		new platformPrototype(5850, 300, "yellow"),
 		new platformPrototype(6000, 100, "magenta"),
 		new platformPrototype(6130, 200, "cyan"),
