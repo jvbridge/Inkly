@@ -278,13 +278,19 @@ mainMenu.init = function() {
 
 	newGame.func = function() {
 		currentLevelNumber = 1;
+		menuTheme.pause();
+		menuTheme.currentTime = 0;
+		theme.currentTime = 0;
+		if (!mute)
+			theme.play();
 		currentLevel = levels[0];
-		death();
+		background.x = 0;
+		inky.Sprite.y = canvas.height - 200;
+		buildLevel();
 		deaths = 0;
 		totalDeaths = 0;
-		buildLevel();
-		setRandomColor();
 		inGame = true;
+		setRandomColor();
 		screenManager.push(gameScreen);
 	}
 
@@ -297,8 +303,14 @@ mainMenu.init = function() {
 	this.gui.addChild(resumeGame);
 	
 	resumeGame.func = function (){
-		if(inGame)
+		if(inGame){
+			menuTheme.pause();
+			menuTheme.currentTime = 0;
+			theme.currentTime = 0;
+			if(!mute)
+				theme.play();
 			screenManager.push(gameScreen);
+		}
 	}
 
 	var credits = new TextButton("Credits");
@@ -353,6 +365,11 @@ pauseMenu.init = function() {
 	returnToMenu.setLabelColors("#aaaaaa", "#ffffff", "#ff0000");
 	this.gui.addChild(returnToMenu);
 	returnToMenu.func = function() {
+		theme.pause();
+		theme.currentTime = 0;
+		menuTheme.currentTime = 0;
+		if(!mute)
+			menuTheme.play();
 		screenManager.remove(pauseMenu);
 		screenManager.remove(gameScreen);
 	}
@@ -373,7 +390,6 @@ pauseMenu.init = function() {
 			theme.pause();
 		}
 	}
-	
 }
 
 levelSummary = new Screen(false, true);
@@ -1206,8 +1222,8 @@ level0.platforms = [
 		new platformPrototype(6900, 450, "black") ]
 
 level0.vPlatforms = [
-		new platformPrototype(3750, -380, "black"),
-		new platformPrototype(4150, -280, "black"),
+		new platformPrototype(3750, -300, "black"),
+		new platformPrototype(4150, -200, "black"),
 		]
 
 level0.floors = []
