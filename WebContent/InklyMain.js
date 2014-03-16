@@ -312,14 +312,14 @@ mainMenu.init = function() {
 			screenManager.push(gameScreen);
 		}
 	}
-
+/* TODO: add credits menu
 	var credits = new TextButton("Credits");
 	credits.y = 197;
 	credits.center = true;
 	credits.label.dropShadow = true;
 	credits.label.fontSize = 30;
 	credits.setLabelColors("#aaaaaa", "#ffffff", "#ff0000");
-	this.gui.addChild(credits);
+	this.gui.addChild(credits);*/
 }
 
 var gameScreen = new Screen(false, true);
@@ -1173,7 +1173,7 @@ level0.platforms = [
 		new platformPrototype(2300, 450, "magenta"),
 		new platformPrototype(2400, 450, "yellow"),
 		new platformPrototype(2550, 450, "yellow"),
-		new platformPrototype(2700, 200, "yellow"),
+		new platformPrototype(2700, 250, "yellow"),
 		new platformPrototype(2850, 100, "yellow"),
 		new platformPrototype(2950, 150, "yellow"),
 		new platformPrototype(3050, 150, "yellow"),
