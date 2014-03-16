@@ -385,7 +385,17 @@ levelSummary.init = function() {
 	this.gui.y = canvas.height / 2;
 	
 	continueFunc = function(){
+		if(currentLevelNumber < 6)
 			screenManager.push(gameScreen);
+		else{
+			inGame = false;
+			theme.currentTime = 0;
+			theme.pause();
+			menuTheme.currentTime = 0;
+			menuTheme.play();
+			levelSummary.image = Textures.load("BackgroundW.png");
+			screenManager.push(mainMenu);
+		}
 	}
 	
 	var continueGame = new Button(continueFunc);
@@ -395,18 +405,18 @@ levelSummary.init = function() {
 	continueGame.width = canvas.width;
 	this.gui.addChild(continueGame);
 	
-	var resumeGame = new TextButton("");
-	resumeGame.y = 0;
-	resumeGame.center = 0;
-	resumeGame.label.dropShadow = false;
-	resumeGame.label.fontSize = 30;
-	resumeGame.setLabelColors("#aaaaaa", "#ffffff", "#ff0000");
-	this.gui.addChild(resumeGame);
 	
-	resumeGame.func = function (){
-			screenManager.push(gameScreen);
-	}
+	//Does not work!
+	this.inkWasted = new TextBox("Ink Wasted");
+	this.inkWasted.x = 50;
+	this.inkWasted.y = 350;
+	this.inkWasted.fontSize = 30;
+	this.inkWasted.bgColor = ("#000000");
+	this.inkWasted.bgFocusColor = ("#ffffff");
+	this.inkWasted.visible = true;
+	this.gui.addChild(this.inkWasted);
 	
+	this.deathReport = new TextBox("Death Report");
 	
 	//TODO add sounds for end level
 }
@@ -830,6 +840,8 @@ function updatePlatforms() {
 			if (vPlatforms[i].color == "yellow")
 				vPlatforms[i].sprite.image = Textures.load("PlatformYV.png");
 		}
+		if (vPlatforms[i].color == "black")
+			vPlatforms[i].sprite.image = Textures.load("PlatformBV.png");
 	}
 }
 
@@ -1039,14 +1051,16 @@ function finish() {
 		levelSummary.image = Textures.load("LevelEnd3.png");
 	if(currentLevelNumber == 4)
 		levelSummary.image = Textures.load("LevelEnd4.png");
-	if(currentLevelNumber == 5){
+	if(currentLevelNumber == 5)
+		levelSummary.image = Textures.load("LevelEnd5.png");
+	if(currentLevelNumber == 6)
 		levelSummary.image = Textures.load("GameEnd.png");
-		//TODO handle code for game over
-	}
+
 
 	screenManager.push(levelSummary);
 	screenManager.remove(gameScreen);
-	
+	//levelSummary.gui.addChild(levelSummary.inkWasted);
+	if (currentLevelNumber < 6){
 	clearLevel();
 	currentLevel = levels[currentLevelNumber];
 	currentLevelNumber++;
@@ -1055,6 +1069,7 @@ function finish() {
 	totalDeaths += deaths;
 	death();
 	deaths = 0;
+	}
 }
 
 /*
@@ -1119,6 +1134,83 @@ function platformPrototype(x, y, color) {
  * where levels are actually defined (start with first one for pushing reasons)
  * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  */
+
+
+level0 = new level(0, 6950);
+
+level0.platforms = [
+		new platformPrototype(550, 450, "black"),
+		new platformPrototype(650, 450, "black"),
+		new platformPrototype(750, 450, "black"),
+		new platformPrototype(950, 450, "black"),
+		new platformPrototype(1150, 450, "black"),
+		new platformPrototype(1200, 450, "black"),
+		new platformPrototype(1350, 250, "black"),
+		new platformPrototype(1500, 350, "black"),
+		new platformPrototype(1600, 450, "cyan"),
+		new platformPrototype(1750, 450, "cyan"),
+		new platformPrototype(1850, 450, "cyan"),
+		new platformPrototype(1950, 450, "cyan"),
+		new platformPrototype(2200, 450, "magenta"),
+		new platformPrototype(2200, 400, "magenta"),
+		new platformPrototype(2200, 450, "magenta"),
+		new platformPrototype(2300, 450, "magenta"),
+		new platformPrototype(2400, 450, "yellow"),
+		new platformPrototype(2550, 450, "yellow"),
+		new platformPrototype(2700, 200, "yellow"),
+		new platformPrototype(2850, 100, "yellow"),
+		new platformPrototype(2950, 150, "yellow"),
+		new platformPrototype(3050, 150, "yellow"),
+		new platformPrototype(3150, 150, "yellow"),
+		new platformPrototype(3250, 150, "yellow"),
+		new platformPrototype(3350, 150, "yellow"),
+		new platformPrototype(3450, 150, "yellow"),
+		new platformPrototype(3550, 150, "yellow"),
+		new platformPrototype(3650, 150, "yellow"),
+		new platformPrototype(3350, 250, "magenta"),
+		new platformPrototype(3450, 250, "magenta"),
+		new platformPrototype(3550, 250, "magenta"),
+		new platformPrototype(3650, 250, "magenta"),
+		new platformPrototype(3750, 250, "magenta"),
+		new platformPrototype(3850, 250, "magenta"),
+		new platformPrototype(3950, 250, "magenta"),
+		new platformPrototype(4050, 250, "magenta"),
+		new platformPrototype(3700, 400, "cyan"),
+		new platformPrototype(3800, 400, "cyan"),
+		new platformPrototype(3900, 400, "cyan"),
+		new platformPrototype(4000, 400, "cyan"),
+		new platformPrototype(4100, 400, "cyan"),
+		new platformPrototype(4200, 400, "cyan"),
+		new platformPrototype(4300, 400, "cyan"),
+		new platformPrototype(4400, 400, "cyan"),
+		new platformPrototype(4500, 400, "cyan"),
+		new platformPrototype(4600, 400, "cyan"),
+		new platformPrototype(4700, 400, "cyan"),
+		new platformPrototype(4900, 400, "magenta"),
+		new platformPrototype(5050, 250, "magenta"),
+		new platformPrototype(5200, 300, "cyan"),
+		new platformPrototype(5300, 200, "yellow"),
+		new platformPrototype(5450, 100, "cyan"),
+		new platformPrototype(5600, 450, "yellow"),
+		new platformPrototype(5700, 220, "magenta"),
+		new platformPrototype(5850, 300, "cyan"),
+		new platformPrototype(6000, 200, "yellow"),
+		new platformPrototype(6100, 100, "magenta"),
+		new platformPrototype(6250, 450, "black"),
+		new platformPrototype(6350, 450, "black"),
+		new platformPrototype(6400, 450, "black"),
+		new platformPrototype(6500, 450, "black"),
+		new platformPrototype(6600, 450, "black"),
+		new platformPrototype(6700, 450, "black"),
+		new platformPrototype(6800, 450, "black"),
+		new platformPrototype(6900, 450, "black") ]
+
+level0.vPlatforms = [
+		new platformPrototype(3750, -380, "black"),
+		new platformPrototype(4150, -280, "black"),
+		]
+
+level0.floors = []
 
 level1 = new level(1, 6950);
 
