@@ -10,19 +10,19 @@ initGame("myCanvas");
  * can choose to make they keys captured from another menu
  */
 
-//1 does cyan
+// 1 does cyan
 gInput.addBool(49, "cyan");
 
-//2 does magenta
+// 2 does magenta
 gInput.addBool(50, "magenta");
 
-//3 does yellow
+// 3 does yellow
 gInput.addBool(51, "yellow");
 
-//space does jump
+// space does jump
 gInput.addBool(32, "jump");
 
-//escape does menu
+// escape does menu
 gInput.addBool(27, "escape");
 
 background = new Sprite;
@@ -38,23 +38,24 @@ palette.x = canvas.width / 2 - palette.width / 2;
 palette.y = 10;
 palette.image = Textures.load("0.png");
 
+/*
+ * ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ * LOAD MUSIC/SOUNDS
+ * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+ */
 
-/*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-  LOAD MUSIC/SOUNDS
- :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
-
-var theme = new Audio("mainsong.mp3"); 
+var theme = new Audio("mainsong.mp3");
 
 theme.addEventListener('ended', function() {
-    this.currentTime = 0;
-    this.play();
+	this.currentTime = 0;
+	this.play();
 }, false);
 
-var menuTheme = new Audio("menu.mp3"); 
+var menuTheme = new Audio("menu.mp3");
 
 menuTheme.addEventListener('ended', function() {
-    this.currentTime = 0;
-    this.play();
+	this.currentTime = 0;
+	this.play();
 }, false);
 
 var fallDeath = new Audio("splat3.mp3");
@@ -260,7 +261,7 @@ mainMenu.init = function() {
 	 * since the size of the game is up for debate, the image will be assumed to
 	 * be variable.
 	 */
-	
+
 	menuTheme.play();
 	this.width = canvas.width;
 	this.height = canvas.height;
@@ -301,25 +302,29 @@ mainMenu.init = function() {
 	resumeGame.label.fontSize = 30;
 	resumeGame.setLabelColors("#aaaaaa", "#ffffff", "#ff0000");
 	this.gui.addChild(resumeGame);
-	
-	resumeGame.func = function (){
-		if(inGame){
+
+	resumeGame.func = function() {
+		if (inGame) {
 			menuTheme.pause();
 			menuTheme.currentTime = 0;
 			theme.currentTime = 0;
-			if(!mute)
+			if (!mute)
 				theme.play();
 			screenManager.push(gameScreen);
 		}
 	}
-/* TODO: add credits menu
+
 	var credits = new TextButton("Credits");
 	credits.y = 197;
 	credits.center = true;
 	credits.label.dropShadow = true;
 	credits.label.fontSize = 30;
 	credits.setLabelColors("#aaaaaa", "#ffffff", "#ff0000");
-	this.gui.addChild(credits);*/
+	this.gui.addChild(credits);
+
+	credits.func = function() {
+		screenManager.push(creditsScreen);
+	}
 }
 
 var gameScreen = new Screen(false, true);
@@ -333,7 +338,7 @@ gameScreen.init = function() {
 	this.Stage.addChild(palette);
 	this.Stage.addChild(background);
 	menuTheme.pause();
-	if(!mute)
+	if (!mute)
 		theme.play();
 }
 
@@ -368,12 +373,12 @@ pauseMenu.init = function() {
 		theme.pause();
 		theme.currentTime = 0;
 		menuTheme.currentTime = 0;
-		if(!mute)
+		if (!mute)
 			menuTheme.play();
 		screenManager.remove(pauseMenu);
 		screenManager.remove(gameScreen);
 	}
-	
+
 	var muteButton = new TextButton("Mute");
 	muteButton.y = 100;
 	muteButton.center = true;
@@ -382,10 +387,10 @@ pauseMenu.init = function() {
 	muteButton.setLabelColors("#aaaaaa", "#ffffff", "#ff0000");
 	this.gui.addChild(muteButton);
 	muteButton.func = function() {
-		if(mute){
+		if (mute) {
 			mute = false;
 			theme.play();
-		}else{
+		} else {
 			mute = true;
 			theme.pause();
 		}
@@ -397,13 +402,13 @@ levelSummary = new Screen(false, true);
 levelSummary.init = function() {
 	this.width = canvas.width;
 	this.height = canvas.height;
-	this.gui.x = canvas.width / 2;
-	this.gui.y = canvas.height / 2;
-	
-	continueFunc = function(){
-		if(currentLevelNumber < 6)
+	this.gui.x = -1 * canvas.width / 2;
+	this.gui.y = -1 * canvas.height / 2;
+
+	continueFunc = function() {
+		if (currentLevelNumber < 6)
 			screenManager.push(gameScreen);
-		else{
+		else {
 			inGame = false;
 			theme.currentTime = 0;
 			theme.pause();
@@ -413,16 +418,15 @@ levelSummary.init = function() {
 			screenManager.push(mainMenu);
 		}
 	}
-	
+
 	var continueGame = new Button(continueFunc);
 	continueGame.y = 0;
 	continueGame.x = 0;
 	continueGame.height = canvas.height;
 	continueGame.width = canvas.width;
 	this.gui.addChild(continueGame);
-	
-	
-	//Does not work!
+
+	// Does not work!
 	this.inkWasted = new TextBox("Ink Wasted");
 	this.inkWasted.x = 50;
 	this.inkWasted.y = 350;
@@ -431,10 +435,10 @@ levelSummary.init = function() {
 	this.inkWasted.bgFocusColor = ("#ffffff");
 	this.inkWasted.visible = true;
 	this.gui.addChild(this.inkWasted);
-	
+
 	this.deathReport = new TextBox("Death Report");
-	
-	//TODO add sounds for end level
+
+	// TODO add sounds for end level
 }
 
 // This makes it so that escape will make the pause screen
@@ -444,7 +448,7 @@ gInput.addFunc(27, function() {
 		screenManager.push(pauseMenu);
 	}
 })
-
+// not used
 var settingsMenu = new Screen(false, true);
 
 settingsMenu.init = function() {
@@ -454,6 +458,27 @@ settingsMenu.init = function() {
 	this.gui.x = canvas.width / 2;
 	this.gui.y = canvas.height / 2;
 	// TODO add buttons here
+}
+
+var creditsScreen = new Screen(false, false);
+
+creditsScreen.init = function() {
+	this.width = canvas.width;
+	this.height = canvas.height;
+	this.gui.x = canvas.width / 2;
+	this.gui.y = canvas.height / 2;
+	this.image = Textures.load("Credits.png");
+
+	returnFunction = function() {
+		screenManager.remove(creditsScreen);
+	}
+
+	var returnMenu = new Button(returnFunction);
+	returnMenu.y = -1 * canvas.height / 2;
+	returnMenu.x = -1 * canvas.width / 2;
+	returnMenu.height = canvas.height;
+	returnMenu.width = canvas.width;
+	this.gui.addChild(returnMenu);
 }
 
 /** ************************************************************************ */
@@ -476,8 +501,6 @@ function inky() {
 	inkySprite.frameHeight = 350;
 	inkySprite.frameCount = 18;
 
-	
-	
 	this.Sprite = inkySprite;
 
 	// all temp variables here
@@ -573,7 +596,7 @@ inky.Sprite.update = function(d) {
 				inky.hovering = false;
 				inky.falling = true;
 				inky.velocity += gravity;
-				console.log("done hovering!");				
+				console.log("done hovering!");
 			}
 		}
 
@@ -617,7 +640,7 @@ inky.Sprite.update = function(d) {
 		updatePlatforms();
 		palette.image = Textures.load("2.png");
 		gameScreen.image = Textures.load("BackgroundC.png");
-		if(!mute)
+		if (!mute)
 			sound1.play();
 		console.log("cyan!");
 	}
@@ -626,7 +649,7 @@ inky.Sprite.update = function(d) {
 		updatePlatforms();
 		palette.image = Textures.load("3.png");
 		gameScreen.image = Textures.load("BackgroundY.png");
-		if(!mute)
+		if (!mute)
 			sound2.play();
 		console.log("yellow!");
 	}
@@ -635,11 +658,10 @@ inky.Sprite.update = function(d) {
 		updatePlatforms();
 		palette.image = Textures.load("1.png");
 		gameScreen.image = Textures.load("BackgroundM.png");
-		if(!mute)
+		if (!mute)
 			sound3.play();
 		console.log("magenta!");
 	}
-
 
 	// this is seeing if inky really should fall
 
@@ -671,13 +693,13 @@ inky.Sprite.update = function(d) {
 		 */
 	}
 
-	if (inky.velocity == 0 && !inky.hovering && !inky.falling){
+	if (inky.velocity == 0 && !inky.hovering && !inky.falling) {
 		inky.Sprite.image = Textures.load("running-25.png");
 		inky.Sprite.frameWidth = 280;
 		inky.Sprite.frameHeight = 350;
 		inky.Sprite.frameCount = 18;
 	}
-	
+
 	// this changes inky's location finally
 	this.y += inky.velocity;
 	if (!inky.dead)
@@ -690,12 +712,12 @@ inky.Sprite.update = function(d) {
 	} else
 		inky.falling = false;
 
-	if (this.y >= canvas.height){
-		if(!mute)
+	if (this.y >= canvas.height) {
+		if (!mute)
 			fallDeath.play();
 		death();
 	}
-		
+
 	vPlatformCollide();
 
 	inky.previousX = inky.Sprite.x;
@@ -955,7 +977,7 @@ function jumpCollide() {
 function vPlatformCollide() {
 	for (var i = 0; i < vPlatforms.length; i++) {
 		if (spriteCollide(vPlatforms[i].sprite) && vPlatforms[i].tangible) {
-			if(!mute)
+			if (!mute)
 				wallDeath.play();
 			death();
 		}
@@ -970,7 +992,7 @@ function setRandomColor() {
 		updatePlatforms();
 		palette.image = Textures.load("2.png");
 		gameScreen.image = Textures.load("BackgroundC.png");
-		if(!mute)
+		if (!mute)
 			sound1.play();
 	}
 	if (colorChoice == 2) {
@@ -978,7 +1000,7 @@ function setRandomColor() {
 		updatePlatforms();
 		palette.image = Textures.load("3.png");
 		gameScreen.image = Textures.load("BackgroundY.png");
-		if(!mute)
+		if (!mute)
 			sound2.play();
 	}
 	if (colorChoice == 3) {
@@ -986,7 +1008,7 @@ function setRandomColor() {
 		updatePlatforms();
 		palette.image = Textures.load("1.png");
 		gameScreen.image = Textures.load("BackgroundM.png");
-		if(!mute)
+		if (!mute)
 			sound3.play();
 	}
 
@@ -1008,7 +1030,7 @@ function clearLevel() {
 		platforms[i].sprite.x = -100;
 		platforms[i].sprite.y = -100;
 	}
-	platforms=[];
+	platforms = [];
 	for (var i = 0; i < jumpables.length; i++) {
 		jumpables[i].sprite.x = -100;
 		jumpables[i].sprite.y = -100;
@@ -1033,16 +1055,16 @@ function death() {
 	inky.dead = true;
 	deathTimerTime++;
 	inky.Sprite.visible = false;
-	
-	if (deathTimerTime % 15 == 1){
+
+	if (deathTimerTime % 15 == 1) {
 		setRandomColor();
 	}
 
 	if (deathTimerTime >= deathTimer) {
 		console.log("background at: " + background.x);
-		//this refreshes the textures on the black platforms and floors
-		for(var i = 0; i < platforms.length; i++){
-			if(platforms[i].color == "black"){
+		// this refreshes the textures on the black platforms and floors
+		for (var i = 0; i < platforms.length; i++) {
+			if (platforms[i].color == "black") {
 				platforms[i].sprite.image = Textures.load("PlatformDOT.png");
 				platforms[i].sprite.image = Textures.load("PlatformB.png");
 			}
@@ -1058,33 +1080,32 @@ function death() {
 }
 
 function finish() {
-	
-	if(currentLevelNumber == 1)
-		levelSummary.image = Textures.load("LevelEnd1.png");
-	if(currentLevelNumber == 2)
-		levelSummary.image = Textures.load("LevelEnd2.png");
-	if(currentLevelNumber == 3)
-		levelSummary.image = Textures.load("LevelEnd3.png");
-	if(currentLevelNumber == 4)
-		levelSummary.image = Textures.load("LevelEnd4.png");
-	if(currentLevelNumber == 5)
-		levelSummary.image = Textures.load("LevelEnd5.png");
-	if(currentLevelNumber == 6)
-		levelSummary.image = Textures.load("GameEnd.png");
 
+	if (currentLevelNumber == 1)
+		levelSummary.image = Textures.load("LevelEnd1.png");
+	if (currentLevelNumber == 2)
+		levelSummary.image = Textures.load("LevelEnd2.png");
+	if (currentLevelNumber == 3)
+		levelSummary.image = Textures.load("LevelEnd3.png");
+	if (currentLevelNumber == 4)
+		levelSummary.image = Textures.load("LevelEnd4.png");
+	if (currentLevelNumber == 5)
+		levelSummary.image = Textures.load("LevelEnd5.png");
+	if (currentLevelNumber == 6)
+		levelSummary.image = Textures.load("GameEnd.png");
 
 	screenManager.push(levelSummary);
 	screenManager.remove(gameScreen);
-	//levelSummary.gui.addChild(levelSummary.inkWasted);
-	if (currentLevelNumber < 6){
-	clearLevel();
-	currentLevel = levels[currentLevelNumber];
-	currentLevelNumber++;
-	background.x = 0;
-	buildLevel();
-	totalDeaths += deaths;
-	death();
-	deaths = 0;
+	// levelSummary.gui.addChild(levelSummary.inkWasted);
+	if (currentLevelNumber < 6) {
+		clearLevel();
+		currentLevel = levels[currentLevelNumber];
+		currentLevelNumber++;
+		background.x = 0;
+		buildLevel();
+		totalDeaths += deaths;
+		death();
+		deaths = 0;
 	}
 }
 
@@ -1130,7 +1151,7 @@ function buildLevel() {
 	for (i = 0; i < currentLevel.floors.length; i++) {
 		new floor(currentLevel.floors[i].start, currentLevel.floors[i].end);
 	}
-	
+
 	deathWall = new platformV(550, 0, "cyan");
 	deathWall.sprite.height = canvas.height;
 
@@ -1144,18 +1165,15 @@ function platformPrototype(x, y, color) {
 	this.color = color;
 }
 
-
 /**
  * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  * where levels are actually defined (start with first one for pushing reasons)
  * :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  */
 
-
 level0 = new level(0, 6950);
 
-level0.platforms = [
-		new platformPrototype(550, 450, "black"),
+level0.platforms = [ new platformPrototype(550, 450, "black"),
 		new platformPrototype(650, 450, "black"),
 		new platformPrototype(750, 450, "black"),
 		new platformPrototype(950, 450, "black"),
@@ -1221,10 +1239,8 @@ level0.platforms = [
 		new platformPrototype(6800, 450, "black"),
 		new platformPrototype(6900, 450, "black") ]
 
-level0.vPlatforms = [
-		new platformPrototype(3750, -300, "black"),
-		new platformPrototype(4150, -200, "black"),
-		]
+level0.vPlatforms = [ new platformPrototype(3750, -300, "black"),
+		new platformPrototype(4150, -200, "black"), ]
 
 level0.floors = []
 
@@ -1292,7 +1308,6 @@ level1.platforms = [ new platformPrototype(550, 350, "black"),
 level1.vPlatforms = []
 
 level1.floors = []
-
 
 level2 = new level(2, 7100);
 
@@ -1513,9 +1528,6 @@ level4.platforms = [ new platformPrototype(0, 450, "black"),
 		new platformPrototype(6900, 450, "black"),
 		new platformPrototype(6950, 450, "black"),
 		new platformPrototype(7000, 450, "black"), ]
-
-
-
 
 level5 = new level(5, 7450);
 
