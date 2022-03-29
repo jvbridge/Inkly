@@ -1118,9 +1118,9 @@ function finish() {
 function level(levelNumber, levelLength) {
 	this.levelNumber = levelNumber;
 	this.levelLength = levelLength;
-	this.platforms = new Array;
-	this.vPlatforms = new Array;
-	this.floors = new Array;
+	this.platforms = [];
+	this.vPlatforms = [];
+	this.floors = [];
 	finishLine = new Sprite;
 	finishLine.x = levelLength;
 	finishLine.y = 0;
