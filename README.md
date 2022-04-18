@@ -7,6 +7,8 @@ I didn't do this alone, there were two other group members but I haven't been ab
 
 Their names are Gavin Hues and Vernon Wong. 
 
+Gavin made most of the art and the music, Vernon did level design
+
 ## Installation
 This game is hosted over at http://jvbridge.github.io/Inkly/ for all to see, if you wish to host it yourself you can merely download the files and put it in your own web hosting devices
 
